@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจองและตรวจสอบบัตรคอนเสิร์ต</title>
+    <title>TAKEOFF LIVE MUSIC | จองบัตรและตรวจสอบสิทธิ์</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
        :root {
@@ -64,13 +64,6 @@
         }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        h2 {
-            text-align: center;
-            color: var(--neon-blue);
-            margin-bottom: 15px;
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
-            font-size: 1.2rem;
-        }
         .form-group { margin-bottom: 18px; }
         label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.9rem; }
         input[type="text"], input[type="tel"], select {
@@ -182,7 +175,26 @@
 
         <!-- หน้าจองบัตร -->
         <div id="bookTab" class="tab-content active">
-            <h2>✨ TAKEOFF LIVE MUSIC ✨</h2>
+            <!-- 🖼️ บรรทัดที่ 1: โลโก้รูป (เปลี่ยน src เป็นลิงก์รูปของคุณได้เลย) -->
+            <div style="text-align: center; margin-bottom: 10px;">
+                <img src="ใส่ลิงก์รูปโลโก้ตรงนี้" alt="Concert Logo" style="max-height: 80px; width: auto; object-fit: contain; border-radius: 8px;">
+            </div>
+            
+            <!-- 🎵 บรรทัดที่ 2: เทคออฟ Live มิวสิค -->
+            <h2 style="color: var(--neon-blue); text-align: center; margin-bottom: 4px; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); font-size: 1.3rem;">
+                เทคออฟ Live มิวสิค
+            </h2>
+            
+            <!-- 🎸 บรรทัดที่ 3: SILLY FOOLS × BODYSLAM -->
+            <p style="text-align: center; color: var(--neon-pink); font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; text-shadow: 0 0 10px rgba(255, 0, 255, 0.4);">
+                SILLY FOOLS × BODYSLAM
+            </p>
+            
+            <!-- 📅 บรรทัดที่ 4: วันที่ 1 ตุลาคม 2569 -->
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+                📅 1 ตุลาคม 2569
+            </p>
+
             <form id="bookingForm" onsubmit="submitForm(event)">
                 <div class="form-group">
                     <label>ชื่อ - นามสกุล</label>
@@ -209,6 +221,12 @@
                     <select id="tableNo" required>
                         <option value="">-- กรุณาเลือกโซนก่อน --</option>
                     </select>
+                </div>
+
+                <!-- กล่องสรุปยอดชำระสุทธิ -->
+                <div style="background: rgba(0, 240, 255, 0.08); border: 1px solid var(--neon-blue); border-radius: 10px; padding: 12px 15px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.9rem; color: var(--text-muted);">ยอดชำระสุทธิ:</span>
+                    <span id="totalPriceText" style="font-size: 1.1rem; font-weight: bold; color: var(--neon-blue);">0 บาท</span>
                 </div>
 
                 <!-- กล่องเลขบัญชี SCB -->
@@ -255,7 +273,7 @@
 
         <!-- หน้าผังที่นั่ง -->
         <div id="mapTab" class="tab-content">
-            <h2>🗺️ ผังโซนและที่นั่ง</h2>
+            <h2 style="color: var(--neon-blue); text-align: center; margin-bottom: 15px;">🗺️ ผังโซนและที่นั่ง</h2>
             <div style="text-align: center;">
                 <img src="https://cdn.phototourl.com/free/2026-08-10-8395b15c-9a44-4c29-b796-83dbe237d283.png" alt="Seating Map" class="map-image">
             </div>
@@ -263,7 +281,7 @@
 
         <!-- หน้าตรวจสอบตั๋ว -->
         <div id="searchTab" class="tab-content">
-            <h2>🔍 ตรวจสอบตั๋วและ QR Code</h2>
+            <h2 style="color: var(--neon-blue); text-align: center; margin-bottom: 15px;">🔍 ตรวจสอบตั๋วและ QR Code</h2>
             <div class="form-group">
                 <label>เบอร์โทรศัพท์</label>
                 <input type="tel" id="searchInput" placeholder="08xxxxxxxx">
@@ -276,7 +294,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmiWKohvrD52Ye9hRRAx1LdZf10JdllFAmKA2IDtNQFNeywu0XlbIJLvfQeMeucaDSzA/exec";
+        const SCRIPT_URL = "ใส่ลิงก์ Web App URL เดิมตรงนี้ (หรือลิงก์ใหม่ของคุณ)";
         const tableOptions = {
             "ZONE VIP": Array.from({length: 40}, (_, i) => "VIP" + (i + 1)),
             "ZONE A": Array.from({length: 40}, (_, i) => "A" + (i + 1)),
@@ -284,6 +302,14 @@
             "ZONE C": Array.from({length: 30}, (_, i) => "C" + (i + 1)),
             "ZONE D": Array.from({length: 50}, (_, i) => "D" + (i + 1)),
             "โซนยืน": ["โซนยืน"]
+        };
+        const zonePrices = {
+            "ZONE VIP": 3999,
+            "ZONE A": 2800,
+            "ZONE B": 2600,
+            "ZONE C": 2600,
+            "ZONE D": 2400,
+            "โซนยืน": 590
         };
         let cdTicketCount = 1;
 
@@ -294,6 +320,18 @@
                 document.execCommand('copy');
                 alert('คัดลอกเลขบัญชี ' + input.value + ' เรียบร้อย!');
             }
+        }
+
+        function calculatePrice() {
+            const zoneSelect = document.getElementById("zone").value;
+            const priceDisplay = document.getElementById("totalPriceText");
+            if (!zoneSelect || !zonePrices[zoneSelect]) {
+                priceDisplay.textContent = "0 บาท";
+                return 0;
+            }
+            let total = (zoneSelect === "โซนยืน") ? (zonePrices[zoneSelect] * cdTicketCount) : zonePrices[zoneSelect];
+            priceDisplay.textContent = total.toLocaleString() + " บาท";
+            return total;
         }
 
         function switchTab(tabId, btnElement) {
@@ -335,6 +373,7 @@
                     });
                 }
             }
+            calculatePrice();
         }
 
         function changeCount(amount) {
@@ -342,6 +381,7 @@
             if (cdTicketCount < 1) cdTicketCount = 1;
             if (cdTicketCount > 20) cdTicketCount = 20;
             document.getElementById("ticketCountDisplay").textContent = cdTicketCount + " ใบ";
+            calculatePrice();
         }
 
         function showFileName() {
