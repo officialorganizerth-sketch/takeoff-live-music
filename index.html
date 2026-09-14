@@ -176,22 +176,17 @@
 
         <!-- หน้าจองบัตร -->
         <div id="bookTab" class="tab-content active">
-            <!-- 🖼️ บรรทัดที่ 1: โลโก้รูป -->
-            <div style="text-align: center; margin-bottom: 10px;">
-                <img src="https://cdn.phototourl.com/free/2026-09-14-58d913ca-43fe-4da9-8a8b-4c067e8119a8.jpg" alt="Concert Logo" style="max-height: 80px; width: auto; object-fit: contain; border-radius: 8px;">
+            <!-- 🖼️ บรรทัดที่ 1: โลโก้รูป (ขนาดใหญ่ขึ้น max-height: 150px) -->
+            <div style="text-align: center; margin-bottom: 12px;">
+                <img src="https://cdn.phototourl.com/free/2026-09-14-c19ad76a-f065-4fc6-bc2a-48017b985bee.jpg" alt="Concert Logo" style="max-height: 150px; width: 100%; max-width: 320px; object-fit: contain; border-radius: 10px;">
             </div>
             
-            <!-- 🎵 บรรทัดที่ 2: TAKEOFF LIVE MUSIC -->
-            <h2 style="color: var(--neon-blue); text-align: center; margin-bottom: 4px; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); font-size: 1.3rem;">
-                TAKEOFF LIVE MUSIC
+            <!-- 🎸 บรรทัดที่ 2: ZEAL × BODYSLAM -->
+            <h2 style="color: var(--neon-pink); text-align: center; margin-bottom: 6px; text-shadow: 0 0 10px rgba(255, 0, 255, 0.5); font-size: 1.35rem;">
+                 ZEAL × BODYSLAM
             </h2>
             
-            <!-- 🎸 บรรทัดที่ 3: ZEAL × BODYSLAM -->
-            <p style="text-align: center; color: var(--neon-pink); font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; text-shadow: 0 0 10px rgba(255, 0, 255, 0.4);">
-                ZEAL × BODYSLAM
-            </p>
-            
-            <!-- 📅 บรรทัดที่ 4: วันที่ 1 ตุลาคม 2569 -->
+            <!-- 📅 บรรทัดที่ 3: วันที่ 1 ตุลาคม 2569 -->
             <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
                 📅 1 ตุลาคม 2569
             </p>
@@ -317,7 +312,6 @@
         };
         let cdTicketCount = 1;
 
-        // ดึงค่าตัวแทนจาก URL เช่น ?agent=TURBO
         const urlParams = new URLSearchParams(window.location.search);
         const currentAgent = urlParams.get('agent') ? urlParams.get('agent').toUpperCase() : "DIRECT";
         if (currentAgent !== "DIRECT") {
@@ -490,7 +484,7 @@
                     let allHtml = "";
                     result.bookings.forEach((booking, bIndex) => {
                         allHtml += `<div style="border-top: 1px dashed var(--neon-blue); margin-top: 15px; padding-top: 10px;">`;
-                        allHtml += `<p style="margin: 5px 0; font-size: 0.9rem;"><strong>รายการที่ ${bIndex + 1}:</strong> ${booking.name} | <b>${booking.tableNo}</b></p>";
+                        allHtml += `<p style="margin: 5px 0; font-size: 0.9rem;"><strong>รายการที่ ${bIndex + 1}:</strong> ${booking.name} | <b>${booking.tableNo}</b></p>`;
                         let ticketsHtml = "";
                         
                         let cleanTickets = [];
