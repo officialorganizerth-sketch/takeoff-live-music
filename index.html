@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจองและตรวจสอบบัตรคอนเสิร์ต</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+       :root {
+            --bg-color: #05050c;
+            --card-bg: rgba(15, 15, 30, 0.85);
+            --neon-blue: #00ffff;
+            --neon-pink: #ff00ff;
+            --neon-glow: 0 0 15px rgba(0, 255, 255, 0.4);
+            --text-color: #ffffff;
+            --text-muted: #94a3b8;
+        }
+        * { box-sizing: border-box; font-family: 'Prompt', sans-serif; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 10%, #0c1b33 0%, var(--bg-color) 80%);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            box-shadow: var(--neon-glow);
+            border-radius: 20px;
+            padding: 25px;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 5px;
+            border-radius: 12px;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 8px 5px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .tab-btn.active {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: var(--neon-glow);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        h2 {
+            text-align: center;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            font-size: 1.2rem;
+        }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; color: var(--text-muted); font-size: 0.9rem; }
+        input[type="text"], input[type="tel"], select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(5, 11, 20, 0.8);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 10px;
+            color: var(--text-color);
+            font-size: 1rem;
+            outline: none;
+        }
+        input:focus, select:focus { border-color: var(--neon-blue); box-shadow: var(--neon-glow); }
+        .counter-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(5, 11, 20, 0.8);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 10px;
+            padding: 5px 15px;
+        }
+        .counter-btn {
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            font-size: 1.2rem;
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .file-upload {
+            border: 2px dashed rgba(0, 240, 255, 0.4);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            background: rgba(0, 240, 255, 0.05);
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .checkbox-group input { accent-color: var(--neon-blue); width: 16px; height: 16px; }
+        button.btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00f0ff, #0077ff);
+            border: none;
+            border-radius: 10px;
+            color: #000;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: var(--neon-glow);
+            margin-top: 10px;
+        }
+        #fileName { margin-top: 4px; font-size: 0.8rem; color: var(--neon-blue); }
+        .result-box {
+            margin-top: 20px;
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        .ticket-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--neon-blue);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+        }
+        .qr-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 10px;
+            border: 1px dashed rgba(0, 240, 255, 0.3);
+            display: inline-block;
+            margin: 6px;
+        }
+        .qr-item img {
+            margin-top: 8px;
+            border-radius: 6px;
+            background: #fff;
+            padding: 6px;
+            width: 110px;
+            height: 110px;
+        }
+        .map-image { width: 100%; border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('book', this)">จองบัตร</button>
+            <button class="tab-btn" onclick="switchTab('map', this)">ผังที่นั่ง</button>
+            <button class="tab-btn" onclick="switchTab('search', this)">ค้นหาบัตร</button>
+        </div>
+
+        <!-- หน้าจองบัตร -->
+        <div id="bookTab" class="tab-content active">
+            <h2>✨ TAKEOFF LIVE MUSIC ✨</h2>
+            <form id="bookingForm" onsubmit="submitForm(event)">
+                <div class="form-group">
+                    <label>ชื่อ - นามสกุล</label>
+                    <input type="text" id="name" required placeholder="กรอกชื่อของคุณ">
+                </div>
+                <div class="form-group">
+                    <label>เบอร์โทรศัพท์</label>
+                    <input type="tel" id="phone" required placeholder="08xxxxxxxx">
+                </div>
+                <div class="form-group">
+                    <label>เลือกโซนที่นั่งและราคา</label>
+                    <select id="zone" required onchange="updateSelectionType()">
+                        <option value="">-- กรุณาเลือกโซน --</option>
+                        <option value="ZONE VIP">ZONE VIP - โต๊ะละ 4 ท่าน (3,999 บาท)</option>
+                        <option value="ZONE A">ZONE A - โต๊ะละ 4 ท่าน (2,800 บาท)</option>
+                        <option value="ZONE B">ZONE B - โต๊ะละ 4 ท่าน (2,600 บาท)</option>
+                        <option value="ZONE C">ZONE C - โต๊ะละ 4 ท่าน (2,600 บาท)</option>
+                        <option value="ZONE D">ZONE D - โต๊ะละ 4 ท่าน (2,400 บาท)</option>
+                        <option value="โซนยืน">โซนยืน - (590 บาท/ใบ)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="dynamicFieldGroup">
+                    <label id="dynamicLabel">เลือกหมายเลขโต๊ะ</label>
+                    <select id="tableNo" required>
+                        <option value="">-- กรุณาเลือกโซนก่อน --</option>
+                    </select>
+                </div>
+
+                <!-- กล่องเลขบัญชี SCB -->
+                <div style="background: rgba(255,255,255,0.05); border: 1px dashed rgba(0, 240, 255, 0.4); border-radius: 12px; padding: 15px; margin: 15px 0; color: #fff;">
+                    <div style="font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; color: #00ffff;">
+                        💳 ช่องทางชำระเงิน / Bank Transfer
+                    </div>
+                    <p style="margin: 5px 0; font-size: 0.85rem; color: #ccc;">ธนาคาร: <strong>ไทยพาณิชย์ (SCB)</strong></p>
+                    <p style="margin: 5px 0; font-size: 0.85rem; color: #ccc;">ชื่อบัญชี: <strong>บริษัท เสริมสุข คอนสตรัคชั่น 1828 จำกัด</strong></p>
+                    
+                    <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid rgba(0, 240, 255, 0.3); padding: 10px 12px; border-radius: 8px; margin-top: 10px;">
+                        <span style="font-size: 0.85rem; color: #94a3b8;">เลขบัญชี:</span>
+                        <input type="text" id="accNum" value="160-435642-7" readonly style="background: transparent; border: none; color: #00ffff; font-size: 0.95rem; font-weight: bold; width: 130px; outline: none; text-align: center;">
+                        <button type="button" onclick="copyAccNum()" style="background: #00ffff; color: #000; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
+                            📋 คัดลอก
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>อัปโหลดสลิปโอนเงิน</label>
+                    <div class="file-upload" onclick="document.getElementById('slipFile').click()">
+                        <span>📎 คลิกเลือกไฟล์สลิป</span>
+                        <input type="file" id="slipFile" accept="image/*" style="display:none" onchange="showFileName()">
+                        <div id="fileName">ยังไม่ได้เลือกไฟล์</div>
+                    </div>
+                    <label class="checkbox-group">
+                        <input type="checkbox" id="lineSlip" onchange="toggleSlipRequirement()">
+                        โอนเงินแล้ว แต่ขอส่งสลิปทาง LINE แทน
+                    </label>
+                </div>
+                <button type="submit" class="btn-submit">ยืนยันการจอง</button>
+            </form>
+
+            <div id="successTicket" class="ticket-card">
+                <h3 style="color: var(--neon-blue); text-align: center; margin-bottom: 10px;">🎉 จองบัตรสำเร็จ!</h3>
+                <p><strong>รหัสจอง:</strong> <span id="sucBookingId"></span></p>
+                <p><strong>ชื่อ:</strong> <span id="sucName"></span></p>
+                <p><strong>โซน/รายการ:</strong> <span id="sucTable"></span></p>
+                <div id="sucQrContainer" style="text-align:center; margin-top:10px;"></div>
+                <button type="button" class="btn-submit" style="margin-top: 15px; background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue);" onclick="location.reload()">จองเพิ่มอีกรายการ</button>
+            </div>
+        </div>
+
+        <!-- หน้าผังที่นั่ง -->
+        <div id="mapTab" class="tab-content">
+            <h2>🗺️ ผังโซนและที่นั่ง</h2>
+            <div style="text-align: center;">
+                <img src="https://cdn.phototourl.com/free/2026-08-10-8395b15c-9a44-4c29-b796-83dbe237d283.png" alt="Seating Map" class="map-image">
+            </div>
+        </div>
+
+        <!-- หน้าตรวจสอบตั๋ว -->
+        <div id="searchTab" class="tab-content">
+            <h2>🔍 ตรวจสอบตั๋วและ QR Code</h2>
+            <div class="form-group">
+                <label>เบอร์โทรศัพท์</label>
+                <input type="tel" id="searchInput" placeholder="08xxxxxxxx">
+            </div>
+            <button type="button" class="btn-submit" onclick="searchTicket()">ค้นหาข้อมูลตั๋ว</button>
+            <div id="searchResult" class="result-box">
+                <div id="searchQrContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzakBToQxQSjJgq_yKnpByF3gWbUPJV7xR4_w3vk2eqUpyjSVFU6HtieBkEn2iNSn8FEA/exec";
+        const tableOptions = {
+            "ZONE VIP": Array.from({length: 40}, (_, i) => "VIP" + (i + 1)),
+            "ZONE A": Array.from({length: 40}, (_, i) => "A" + (i + 1)),
+            "ZONE B": Array.from({length: 30}, (_, i) => "B" + (i + 1)),
+            "ZONE C": Array.from({length: 30}, (_, i) => "C" + (i + 1)),
+            "ZONE D": Array.from({length: 50}, (_, i) => "D" + (i + 1)),
+            "โซนยืน": ["โซนยืน"]
+        };
+        let cdTicketCount = 1;
+
+        function copyAccNum() {
+            const input = document.getElementById('accNum');
+            if (input) {
+                input.select();
+                document.execCommand('copy');
+                alert('คัดลอกเลขบัญชี ' + input.value + ' เรียบร้อย!');
+            }
+        }
+
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.style.display = 'none';
+                el.classList.remove('active');
+            });
+            const target = document.getElementById(tabId + 'Tab');
+            if (target) {
+                target.style.display = 'block';
+                target.classList.add('active');
+            }
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+        }
+
+        function updateSelectionType() {
+            const zoneSelect = document.getElementById("zone").value;
+            const dynamicFieldGroup = document.getElementById("dynamicFieldGroup");
+            dynamicFieldGroup.innerHTML = '';
+            if (zoneSelect === "โซนยืน") {
+                cdTicketCount = 1;
+                dynamicFieldGroup.innerHTML = `<label>เลือกจำนวนบัตรโซนยืน</label>
+                    <div class="counter-box">
+                        <button type="button" class="counter-btn" onclick="changeCount(-1)">-</button>
+                        <span id="ticketCountDisplay">1 ใบ</span>
+                        <button type="button" class="counter-btn" onclick="changeCount(1)">+</button>
+                    </div>`;
+            } else {
+                dynamicFieldGroup.innerHTML = `<label>เลือกหมายเลขโต๊ะ</label>
+                    <select id="tableNo" required><option value="">-- กรุณาเลือกโต๊ะ --</option></select>`;
+                if (zoneSelect && tableOptions[zoneSelect]) {
+                    const tableSelect = document.getElementById("tableNo");
+                    tableOptions[zoneSelect].forEach(table => {
+                        let opt = document.createElement("option");
+                        opt.value = table;
+                        opt.textContent = "โต๊ะ " + table;
+                        tableSelect.appendChild(opt);
+                    });
+                }
+            }
+        }
+
+        function changeCount(amount) {
+            cdTicketCount += amount;
+            if (cdTicketCount < 1) cdTicketCount = 1;
+            if (cdTicketCount > 20) cdTicketCount = 20;
+            document.getElementById("ticketCountDisplay").textContent = cdTicketCount + " ใบ";
+        }
+
+        function showFileName() {
+            const fileInput = document.getElementById("slipFile");
+            if (fileInput.files.length > 0) {
+                document.getElementById("fileName").textContent = "📄 " + fileInput.files[0].name;
+            }
+        }
+
+        function toggleSlipRequirement() {
+            const isLine = document.getElementById("lineSlip").checked;
+            if (isLine) {
+                document.getElementById("slipFile").value = "";
+                document.getElementById("fileName").textContent = "ส่งสลิปผ่าน LINE แล้ว";
+            } else {
+                document.getElementById("fileName").textContent = "ยังไม่ได้เลือกไฟล์";
+            }
+        }
+
+        async function submitForm(e) {
+            e.preventDefault();
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const zone = document.getElementById("zone").value;
+            const isLine = document.getElementById("lineSlip").checked;
+            const fileInput = document.getElementById("slipFile");
+
+            if (!isLine && fileInput.files.length === 0) {
+                alert("กรุณาแนบสลิป หรือเลือกติ๊กช่องส่งสลิปทาง LINE ครับ");
+                return;
+            }
+
+            let tableNoVal = (zone === "โซนยืน") ? cdTicketCount + " ใบ" : (document.getElementById("tableNo")?.value || "");
+            if (zone !== "โซนยืน" && !tableNoVal) {
+                alert("กรุณาเลือกหมายเลขโต๊ะครับ");
+                return;
+            }
+
+            const bookingId = "TICKET-" + Math.floor(1000 + Math.random() * 9000);
+            const selectionDetail = (zone === "โซนยืน") ? "โซนยืน (" + tableNoVal + ")" : zone + " (โต๊ะ " + tableNoVal + ")";
+            let ticketsArr = (zone === "โซนยืน") ? Array.from({length: cdTicketCount}, (_, i) => bookingId + "-CD" + (i + 1)) : [bookingId + "-1", bookingId + "-2", bookingId + "-3", bookingId + "-4"];
+
+            const payload = {
+                action: "bookTicket",
+                bookingId: bookingId,
+                name: name,
+                phone: phone,
+                tableNo: selectionDetail,
+                tickets: ticketsArr,
+                agent: localStorage.getItem('agent_code') || ""
+            };
+
+            if (fileInput && fileInput.files.length > 0) {
+                let file = fileInput.files[0];
+                payload.slipData = await new Promise(res => { let r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file); });
+                payload.fileName = file.name;
+                payload.mimeType = file.type;
+            }
+
+            try {
+                const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+                const result = await response.json();
+                if (result.status === "success") {
+                    document.getElementById("bookingForm").style.display = "none";
+                    document.getElementById("sucBookingId").textContent = bookingId;
+                    document.getElementById("sucName").textContent = name;
+                    document.getElementById("sucTable").textContent = selectionDetail;
+                    let qrHtml = "";
+                    ticketsArr.forEach((tCode, index) => {
+                        const qrText = encodeURIComponent("TICKET: " + tCode + " | Name: " + name + " | Detail: " + selectionDetail);
+                        qrHtml += `<div class="qr-item"><p style="font-size:0.8rem; color:var(--neon-blue);">ใบที่ ${index + 1}</p><p style="font-size:0.85rem;"><b>${tCode}</b></p><img src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${qrText}" alt="QR Ticket"></div>`;
+                    });
+                    document.getElementById("sucQrContainer").innerHTML = qrHtml;
+                    document.getElementById("successTicket").style.display = "block";
+                } else {
+                    alert("❌ เกิดข้อผิดพลาด: " + result.message);
+                }
+            } catch (err) {
+                alert("❌ ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+            }
+        }
+
+        async function searchTicket() {
+            const searchInput = document.getElementById("searchInput")?.value.trim() || "";
+            const resBox = document.getElementById("searchResult");
+            const qrContainer = document.getElementById("searchQrContainer");
+            if (!searchInput) { alert("กรุณากรอกเบอร์โทรศัพท์"); return; }
+            try {
+                qrContainer.innerHTML = "<p style='text-align:center;'>กำลังค้นหาข้อมูล...</p>";
+                resBox.style.display = "block";
+                const response = await fetch(SCRIPT_URL + "?phone=" + encodeURIComponent(searchInput));
+                const result = await response.json();
+                if (result.status === "success" && result.bookings && result.bookings.length > 0) {
+                    let allHtml = "";
+                    result.bookings.forEach((booking, bIndex) => {
+                        allHtml += `<div style="border-top: 1px dashed var(--neon-blue); margin-top: 15px; padding-top: 10px;">`;
+                        allHtml += `<p style="margin: 5px 0; font-size: 0.9rem;"><strong>รายการที่ ${bIndex + 1}:</strong> ${booking.name} | <b>${booking.tableNo}</b></p>`;
+                        let ticketsHtml = "";
+                        if (booking.tickets) {
+                            booking.tickets.forEach((tCode, index) => {
+                                if (tCode && tCode.trim() !== "") {
+                                    const qrText = encodeURIComponent("TICKET: " + tCode + " | Name: " + booking.name + " | Table: " + booking.tableNo);
+                                    ticketsHtml += `<div class="qr-item"><p style="font-size: 0.8rem; color: var(--neon-blue);">ใบที่ ${index + 1}</p><p style="font-size: 0.85rem;"><b>${tCode}</b></p><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrText}" alt="QR Ticket"></div>`;
+                                }
+                            });
+                        }
+                        allHtml += `<div>${ticketsHtml}</div></div>`;
+                    });
+                    qrContainer.innerHTML = allHtml;
+                } else {
+                    qrContainer.innerHTML = "<p style='color:#ff4444; text-align:center;'>ไม่พบข้อมูลตั๋วจากเบอร์นี้</p>";
+                }
+            } catch (err) {
+                qrContainer.innerHTML = "<p style='color:#ff4444; text-align:center;'>❌ เกิดข้อผิดพลาดในการเชื่อมต่อ</p>";
+            }
+        }
+
+        const agentCode = new URLSearchParams(window.location.search).get('agent');
+        if (agentCode) localStorage.setItem('agent_code', agentCode);
+        else localStorage.removeItem('agent_code');
+    </script>
+</body>
+</html>
