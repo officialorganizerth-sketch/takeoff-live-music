@@ -163,6 +163,7 @@
             height: 110px;
         }
         .map-image { width: 100%; border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.3); }
+        .agent-badge { text-align: center; font-size: 0.8rem; color: var(--neon-blue); margin-bottom: 12px; display: none; }
     </style>
 </head>
 <body>
@@ -177,7 +178,7 @@
         <div id="bookTab" class="tab-content active">
             <!-- 🖼️ บรรทัดที่ 1: โลโก้รูป -->
             <div style="text-align: center; margin-bottom: 10px;">
-                <img src="ใส่ลิงก์รูปโลโก้ตรงนี้" alt="Concert Logo" style="max-height: 80px; width: auto; object-fit: contain; border-radius: 8px;">
+                <img src="https://cdn.phototourl.com/free/2026-09-14-58d913ca-43fe-4da9-8a8b-4c067e8119a8.jpg" alt="Concert Logo" style="max-height: 80px; width: auto; object-fit: contain; border-radius: 8px;">
             </div>
             
             <!-- 🎵 บรรทัดที่ 2: TAKEOFF LIVE MUSIC -->
@@ -191,9 +192,11 @@
             </p>
             
             <!-- 📅 บรรทัดที่ 4: วันที่ 1 ตุลาคม 2569 -->
-            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
                 📅 1 ตุลาคม 2569
             </p>
+
+            <div id="agentBanner" class="agent-badge">🎫 จองผ่านช่องทางตัวแทน: <span id="agentNameDisplay">-</span></div>
 
             <form id="bookingForm" onsubmit="submitForm(event)">
                 <div class="form-group">
@@ -284,7 +287,8 @@
             <h2 style="color: var(--neon-blue); text-align: center; margin-bottom: 15px;">🔍 ตรวจสอบตั๋วและ QR Code</h2>
             <div class="form-group">
                 <label>เบอร์โทรศัพท์</label>
-                <input type="tel" id="searchInput" placeholder="08xxxxxxxx">
+                <input type="tel" id="searchInput" placeholder="8xxxxxxxx">
+                <div style="font-size: 0.78rem; color: var(--neon-blue); margin-top: 5px;">* ไม่ต้องใส่เลข 0 ตัวหน้า (เช่น 8xxxxxxxx)</div>
             </div>
             <button type="button" class="btn-submit" onclick="searchTicket()">ค้นหาข้อมูลตั๋ว</button>
             <div id="searchResult" class="result-box">
@@ -294,7 +298,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmiWKohvrD52Ye9hRRAx1LdZf10JdllFAmKA2IDtNQFNeywu0XlbIJLvfQeMeucaDSzA/exec";
+        const SCRIPT_URL = "ใส่ลิงก์ Web App URL เดิมตรงนี้ (หรือลิงก์ใหม่ของคุณ)";
         const tableOptions = {
             "ZONE VIP": Array.from({length: 40}, (_, i) => "VIP" + (i + 1)),
             "ZONE A": Array.from({length: 40}, (_, i) => "A" + (i + 1)),
@@ -312,6 +316,14 @@
             "โซนยืน": 590
         };
         let cdTicketCount = 1;
+
+        // ดึงค่าตัวแทนจาก URL เช่น ?agent=TURBO
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentAgent = urlParams.get('agent') ? urlParams.get('agent').toUpperCase() : "DIRECT";
+        if (currentAgent !== "DIRECT") {
+            document.getElementById('agentBanner').style.display = 'block';
+            document.getElementById('agentNameDisplay').textContent = currentAgent;
+        }
 
         function copyAccNum() {
             const input = document.getElementById('accNum');
@@ -431,7 +443,7 @@
                 phone: phone,
                 tableNo: selectionDetail,
                 tickets: ticketsArr,
-                agent: localStorage.getItem('agent_code') || ""
+                agent: currentAgent
             };
 
             if (fileInput && fileInput.files.length > 0) {
@@ -478,21 +490,19 @@
                     let allHtml = "";
                     result.bookings.forEach((booking, bIndex) => {
                         allHtml += `<div style="border-top: 1px dashed var(--neon-blue); margin-top: 15px; padding-top: 10px;">`;
-                        allHtml += `<p style="margin: 5px 0; font-size: 0.9rem;"><strong>รายการที่ ${bIndex + 1}:</strong> ${booking.name} | <b>${booking.tableNo}</b></p>`;
+                        allHtml += `<p style="margin: 5px 0; font-size: 0.9rem;"><strong>รายการที่ ${bIndex + 1}:</strong> ${booking.name} | <b>${booking.tableNo}</b></p>";
                         let ticketsHtml = "";
                         
-                        // ฟิลเตอร์เฉพาะรหัสที่ขึ้นต้นด้วย TICKET- หรือหน้าตาเหมือนรหัสจริง ไม่เอาคำว่า 'ไม่มีสลิป' มาแปะ
                         let cleanTickets = [];
                         if (booking.tickets) {
-                            booking.tickets.forEach(rawItem => {
-                                if (!rawItem) return;
-                                // เผื่อกรณีติดกันมาด้วยคอมมา
-                                String(rawItem).split(',').map(s => s.trim()).forEach(sub => {
-                                    if (sub && sub.startsWith("TICKET-") && !sub.includes("สลิป")) {
-                                        cleanTickets.push(sub);
-                                    }
-                                });
+                          booking.tickets.forEach(rawItem => {
+                            if (!rawItem) return;
+                            String(rawItem).split(',').map(s => s.trim()).forEach(sub => {
+                              if (sub && sub.startsWith("TICKET-") && !sub.includes("สลิป")) {
+                                cleanTickets.push(sub);
+                              }
                             });
+                          });
                         }
 
                         cleanTickets.forEach((tCode, index) => {
@@ -510,10 +520,6 @@
                 qrContainer.innerHTML = "<p style='color:#ff4444; text-align:center;'>❌ เกิดข้อผิดพลาดในการเชื่อมต่อ</p>";
             }
         }
-
-        const agentCode = new URLSearchParams(window.location.search).get('agent');
-        if (agentCode) localStorage.setItem('agent_code', agentCode);
-        else localStorage.removeItem('agent_code');
     </script>
 </body>
 </html>
