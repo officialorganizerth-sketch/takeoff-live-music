@@ -175,19 +175,19 @@
 
         <!-- หน้าจองบัตร -->
         <div id="bookTab" class="tab-content active">
-            <!-- 🖼️ บรรทัดที่ 1: โลโก้รูป (เปลี่ยน src เป็นลิงก์รูปของคุณได้เลย) -->
+            <!-- 🖼️ บรรทัดที่ 1: โลโก้รูป -->
             <div style="text-align: center; margin-bottom: 10px;">
                 <img src="ใส่ลิงก์รูปโลโก้ตรงนี้" alt="Concert Logo" style="max-height: 80px; width: auto; object-fit: contain; border-radius: 8px;">
             </div>
             
-            <!-- 🎵 บรรทัดที่ 2: TAKEOFF LIVE MUSIC -->
+            <!-- 🎵 บรรทัดที่ 2: เทคออฟ Live มิวสิค -->
             <h2 style="color: var(--neon-blue); text-align: center; margin-bottom: 4px; text-shadow: 0 0 10px rgba(0, 240, 255, 0.5); font-size: 1.3rem;">
-                TAKEOFF LIVE MUSIC
+                เทคออฟ Live มิวสิค
             </h2>
             
-            <!-- 🎸 บรรทัดที่ 3: ZEAL × BODYSLAM -->
+            <!-- 🎸 บรรทัดที่ 3: SILLY FOOLS × BODYSLAM -->
             <p style="text-align: center; color: var(--neon-pink); font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; text-shadow: 0 0 10px rgba(255, 0, 255, 0.4);">
-                ZEAL × BODYSLAM
+                SILLY FOOLS × BODYSLAM
             </p>
             
             <!-- 📅 บรรทัดที่ 4: วันที่ 1 ตุลาคม 2569 -->
@@ -294,7 +294,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmiWKohvrD52Ye9hRRAx1LdZf10JdllFAmKA2IDtNQFNeywu0XlbIJLvfQeMeucaDSzA/exec";
+        const SCRIPT_URL = "ใส่ลิงก์ Web App URL เดิมตรงนี้ (หรือลิงก์ใหม่ของคุณ)";
         const tableOptions = {
             "ZONE VIP": Array.from({length: 40}, (_, i) => "VIP" + (i + 1)),
             "ZONE A": Array.from({length: 40}, (_, i) => "A" + (i + 1)),
@@ -480,15 +480,27 @@
                         allHtml += `<div style="border-top: 1px dashed var(--neon-blue); margin-top: 15px; padding-top: 10px;">`;
                         allHtml += `<p style="margin: 5px 0; font-size: 0.9rem;"><strong>รายการที่ ${bIndex + 1}:</strong> ${booking.name} | <b>${booking.tableNo}</b></p>`;
                         let ticketsHtml = "";
+                        
+                        // ฟิลเตอร์เฉพาะรหัสที่ขึ้นต้นด้วย TICKET- หรือหน้าตาเหมือนรหัสจริง ไม่เอาคำว่า 'ไม่มีสลิป' มาแปะ
+                        let cleanTickets = [];
                         if (booking.tickets) {
-                            booking.tickets.forEach((tCode, index) => {
-                                if (tCode && tCode.trim() !== "") {
-                                    const qrText = encodeURIComponent("TICKET: " + tCode + " | Name: " + booking.name + " | Table: " + booking.tableNo);
-                                    ticketsHtml += `<div class="qr-item"><p style="font-size: 0.8rem; color: var(--neon-blue);">ใบที่ ${index + 1}</p><p style="font-size: 0.85rem;"><b>${tCode}</b></p><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrText}" alt="QR Ticket"></div>`;
-                                }
+                            booking.tickets.forEach(rawItem => {
+                                if (!rawItem) return;
+                                // เผื่อกรณีติดกันมาด้วยคอมมา
+                                String(rawItem).split(',').map(s => s.trim()).forEach(sub => {
+                                    if (sub && sub.startsWith("TICKET-") && !sub.includes("สลิป")) {
+                                        cleanTickets.push(sub);
+                                    }
+                                });
                             });
                         }
-                        allHtml += `<div>${ticketsHtml}</div></div>`;
+
+                        cleanTickets.forEach((tCode, index) => {
+                            const qrText = encodeURIComponent("TICKET: " + tCode + " | Name: " + booking.name + " | Table: " + booking.tableNo);
+                            ticketsHtml += `<div class="qr-item"><p style="font-size: 0.8rem; color: var(--neon-blue);">ใบที่ ${index + 1}</p><p style="font-size: 0.85rem;"><b>${tCode}</b></p><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrText}" alt="QR Ticket"></div>`;
+                        });
+
+                        allHtml += `<div>${ticketsHtml || '<p style="font-size:0.8rem; color:#888;">ไม่มีรหัสตั๋วแยกใบแสดง</p>'}</div></div>`;
                     });
                     qrContainer.innerHTML = allHtml;
                 } else {
