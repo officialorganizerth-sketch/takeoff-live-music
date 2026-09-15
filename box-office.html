@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Runway Box Office - หน้างาน</title>
+    <title>Runway Box Office - หน้างาน (Persistent)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -17,12 +17,12 @@
 <body class="p-4 md:p-6">
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <!-- ฝั่งซ้าย/บน: ผังคอนเสิร์ตและเลือกโต๊ะ (3 ส่วน) -->
+        <!-- ฝั่งซ้าย/บน: ผังคอนเสิร์ตและเลือกโต๊ะ -->
         <div class="lg:col-span-3 bg-slate-800/80 p-4 md:p-6 rounded-2xl border border-slate-700 shadow-xl">
             <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
                 <div>
                     <h1 class="text-xl md:text-2xl font-bold text-amber-400">🎟️ RUNWAY BOX OFFICE</h1>
-                    <p class="text-xs text-slate-400">คลิกเลือกโต๊ะเพื่อออก Wristband (สีตามโซน)</p>
+                    <p class="text-xs text-slate-400">บันทึกอัตโนมัติในเครื่อง (รีเฟรชไม่หาย)</p>
                 </div>
                 <!-- Legend สี Wristband -->
                 <div class="flex flex-wrap gap-2 text-xs">
@@ -39,7 +39,7 @@
                 ✨ STAGE (เวที) ✨
             </div>
 
-            <!-- ผังโซน VIP, A, B, C, D (จำลองตามบล็อกรูป) -->
+            <!-- ผังโซน VIP, A, B, C, D -->
             <div class="space-y-6 overflow-x-auto pb-4">
                 <!-- Zone VIP -->
                 <div>
@@ -51,7 +51,7 @@
                     <div class="text-xs font-semibold text-pink-400 mb-2">ZONE A (2,800 THB / 4 Pts)</div>
                     <div class="grid grid-cols-10 sm:grid-cols-20 gap-1.5" id="grid-A"></div>
                 </div>
-                <!-- Zone B & C แถวคู่กัน -->
+                <!-- Zone B & C -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <div class="text-xs font-semibold text-sky-400 mb-2">ZONE B (2,600 THB)</div>
@@ -109,6 +109,11 @@
                     class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold rounded-xl shadow-lg transition text-base">
                     ✅ ยืนยันการขาย & ออก Wristband
                 </button>
+
+                <!-- ปุ่มล้างข้อมูลวันใหม่ (ซ่อนไว้/กดใช้ตอนจบงานหรือเริ่มงานใหม่) -->
+                <button onclick="resetData()" class="w-full py-1.5 text-xs text-slate-500 hover:text-red-400 transition">
+                    ⚠️ รีเซ็ตข้อมูลทั้งหมด (เริ่มใหม่)
+                </button>
             </div>
         </div>
 
@@ -125,11 +130,26 @@
 
         let selectedSeatId = null;
         let selectedZone = null;
-        let totalRevenue = 0;
-        let soldSeats = new Set(); // จำลองโต๊ะที่ถูกจองแล้วจาก 1-2 วันก่อน
 
-        // จำลองตัวอย่างโต๊ะที่ถูกจองไปแล้วบางอัน (เช่น VIP05, A02)
-        soldSeats.add('VIP-05'); soldSeats.add('A-02');
+        // โหลดข้อมูลที่เซ็นไว้ในเครื่อง (localStorage) ถ้าไม่มีให้เป็นเซ็ตว่าง
+        let soldSeats = new Set(JSON.parse(localStorage.getItem('runway_sold_seats') || '["VIP-05", "A-02"]')); // ค่าเริ่มต้นตัวอย่าง
+
+        function saveState() {
+            localStorage.setItem('runway_sold_seats', JSON.stringify(Array.from(soldSeats)));
+            updateRevenueDisplay();
+        }
+
+        function updateRevenueDisplay() {
+            let total = 0;
+            soldSeats.forEach(seatId => {
+                const zoneMatch = seatId.match(/^([A-Z]+)/);
+                if (zoneMatch) {
+                    const z = zoneMatch[1];
+                    if (zoneData[z]) total += zoneData[z].price;
+                }
+            });
+            document.getElementById('total-revenue').innerText = total.toLocaleString() + ' THB';
+        }
 
         function initGrids() {
             for (const [zone, config] of Object.entries(zoneData)) {
@@ -137,7 +157,6 @@
                 container.innerHTML = '';
                 for (let i = 1; i <= config.count; i++) {
                     const seatId = `${zone}-${i < 10 ? '0' + i : i}`;
-                    const btn = document.createElement('div0' === '1' ? 'div' : 'div'); // dummy
                     const el = document.createElement('div');
                     el.className = `seat text-center py-1.5 px-1 rounded-lg border text-xs font-semibold ${config.color}`;
                     if (soldSeats.has(seatId)) {
@@ -153,7 +172,6 @@
 
                     el.addEventListener('click', () => {
                         if (el.classList.contains('sold')) return;
-                        document.querySelectorAll('.seat').s ? document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected')) : '';
                         document.querySelectorAll('.seat').forEach(s => s.classList.remove('selected'));
                         el.classList.add('selected');
                         
@@ -168,16 +186,16 @@
                     container.appendChild(el);
                 }
             }
+            updateRevenueDisplay();
         }
 
         function confirmSale() {
             if (!selectedSeatId) return;
             if (confirm(`ยืนยันการขายโต๊ะ ${selectedSeatId} (สวม Wristband สี ${document.getElementById('target-wristband').innerText})?`)) {
                 soldSeats.add(selectedSeatId);
-                totalRevenue += zoneData[selectedZone].price;
-                document.getElementById('total-revenue').innerText = totalRevenue.toLocaleString() + ' THB';
+                saveState();
                 
-                // รีเซ็ตหน้าจอเลือก
+                // รีเซ็ตหน้าจอเลือกฝั่งขวา
                 selectedSeatId = null;
                 document.getElementById('selected-seat-label').innerText = 'ยังไม่ได้เลือกโต๊ะ';
                 document.getElementById('target-wristband').innerText = '-';
@@ -187,6 +205,14 @@
                 
                 initGrids();
                 alert('✔️ บันทึกการขายเรียบร้อย! หยิบ Wristband สวมให้ลูกค้าได้เลย');
+            }
+        }
+
+        function resetData() {
+            if (confirm('⚠️ ต้องการล้างข้อมูลการขายหน้างานทั้งหมดจริงไหม?')) {
+                localStorage.removeItem('runway_sold_seats');
+                soldSeats = new Set();
+                initGrids();
             }
         }
 
