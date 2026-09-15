@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Runway Box Office - หน้างาน (Persistent)</title>
+    <title>Runway Box Office - Realtime Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -17,41 +17,31 @@
 <body class="p-4 md:p-6">
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <!-- ฝั่งซ้าย/บน: ผังคอนเสิร์ตและเลือกโต๊ะ -->
         <div class="lg:col-span-3 bg-slate-800/80 p-4 md:p-6 rounded-2xl border border-slate-700 shadow-xl">
             <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
                 <div>
-                    <h1 class="text-xl md:text-2xl font-bold text-amber-400">🎟️ RUNWAY BOX OFFICE</h1>
-                    <p class="text-xs text-slate-400">บันทึกอัตโนมัติในเครื่อง (รีเฟรชไม่หาย)</p>
+                    <h1 class="text-xl md:text-2xl font-bold text-amber-400">🎟️ RUNWAY BOX OFFICE (Realtime Sync)</h1>
+                    <p class="text-xs text-slate-400">ซิงค์ข้อมูลผ่าน Google Sheets อัตโนมัติทุก 4 วินาที</p>
                 </div>
-                <!-- Legend สี Wristband -->
-                <div class="flex flex-wrap gap-2 text-xs">
-                    <span class="px-2 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">VIP (ทอง)</span>
-                    <span class="px-2 py-1 rounded bg-pink-500/20 text-pink-300 border border-pink-500/40">Zone A (ชมพู)</span>
-                    <span class="px-2 py-1 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40">Zone B (ฟ้า)</span>
-                    <span class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Zone C (เขียว)</span>
-                    <span class="px-2 py-1 rounded bg-orange-500/20 text-orange-300 border border-orange-500/40">Zone D (ส้ม)</span>
+                <div class="flex items-center gap-2">
+                    <span id="sync-status" class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">● Connected</span>
+                    <button onclick="fetchRemoteData()" class="text-xs px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded-lg text-white">🔄 รีเฟรชสด</button>
                 </div>
             </div>
 
-            <!-- STAGE -->
             <div class="w-full bg-slate-900 border-2 border-amber-500/50 text-center py-2 rounded-xl mb-6 font-bold tracking-widest text-amber-400 shadow-inner">
                 ✨ STAGE (เวที) ✨
             </div>
 
-            <!-- ผังโซน VIP, A, B, C, D -->
             <div class="space-y-6 overflow-x-auto pb-4">
-                <!-- Zone VIP -->
                 <div>
                     <div class="text-xs font-semibold text-amber-400 mb-2">ZONE VIP (3,999 THB / 4 Pts)</div>
                     <div class="grid grid-cols-10 sm:grid-cols-20 gap-1.5" id="grid-VIP"></div>
                 </div>
-                <!-- Zone A -->
                 <div>
                     <div class="text-xs font-semibold text-pink-400 mb-2">ZONE A (2,800 THB / 4 Pts)</div>
                     <div class="grid grid-cols-10 sm:grid-cols-20 gap-1.5" id="grid-A"></div>
                 </div>
-                <!-- Zone B & C -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <div class="text-xs font-semibold text-sky-400 mb-2">ZONE B (2,600 THB)</div>
@@ -62,7 +52,6 @@
                         <div class="grid grid-cols-10 gap-1.5" id="grid-C"></div>
                     </div>
                 </div>
-                <!-- Zone D -->
                 <div>
                     <div class="text-xs font-semibold text-orange-400 mb-2">ZONE D (2,400 THB)</div>
                     <div class="grid grid-cols-10 sm:grid-cols-25 gap-1.5" id="grid-D"></div>
@@ -70,7 +59,6 @@
             </div>
         </div>
 
-        <!-- ฝั่งขวา: แผงชำระเงินและออก Wristband -->
         <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700 shadow-xl flex flex-col justify-between">
             <div>
                 <h2 class="text-lg font-bold text-white mb-4 border-b border-slate-700 pb-2">🛒 ทำรายการขายหน้างาน</h2>
@@ -92,13 +80,12 @@
                     </div>
 
                     <div>
-                        <label class="text-xs text-slate-400 block mb-1">ชื่อเล่น/เบอร์ย่อ ลูกค้า (ถ้ามี):</label>
+                        <label class="text-xs text-slate-400 block mb-1">ชื่อเล่น/เบอร์ย่อ ลูกค้า:</label>
                         <input type="text" id="cust-note" placeholder="เช่น พี่เอ / 9912" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-sky-500">
                     </div>
                 </div>
             </div>
 
-            <!-- สรุปสถิติ & ปุ่มยืนยัน -->
             <div class="mt-6 space-y-4">
                 <div class="flex justify-between text-xs text-slate-400 bg-slate-900/40 p-3 rounded-lg">
                     <span>ยอดขายรวมหน้างาน:</span>
@@ -109,17 +96,14 @@
                     class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold rounded-xl shadow-lg transition text-base">
                     ✅ ยืนยันการขาย & ออก Wristband
                 </button>
-
-                <!-- ปุ่มล้างข้อมูลวันใหม่ (ซ่อนไว้/กดใช้ตอนจบงานหรือเริ่มงานใหม่) -->
-                <button onclick="resetData()" class="w-full py-1.5 text-xs text-slate-500 hover:text-red-400 transition">
-                    ⚠️ รีเซ็ตข้อมูลทั้งหมด (เริ่มใหม่)
-                </button>
             </div>
         </div>
 
     </div>
 
     <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbz9wMUrfpTKGGPlEtxuppH6M0LdspqLU6qKFqkjBeVfXMGRFJSiMqgr9iGbbYCCVKOz/exec"; // <--- เปลี่ยนตรงนี้เป็น URL ที่ได้จาก GAS
+        
         const zoneData = {
             'VIP': { count: 20, price: 3999, color: 'bg-amber-500/30 border-amber-500/60 text-amber-200', wb: 'ทอง (Gold)' },
             'A': { count: 40, price: 2800, color: 'bg-pink-500/30 border-pink-500/60 text-pink-200', wb: 'ชมพู (Pink)' },
@@ -130,30 +114,41 @@
 
         let selectedSeatId = null;
         let selectedZone = null;
+        let soldSeats = new Set();
 
-        // โหลดข้อมูลที่เซ็นไว้ในเครื่อง (localStorage) ถ้าไม่มีให้เป็นเซ็ตว่าง
-        let soldSeats = new Set(JSON.parse(localStorage.getItem('runway_sold_seats') || '["VIP-05", "A-02"]')); // ค่าเริ่มต้นตัวอย่าง
-
-        function saveState() {
-            localStorage.setItem('runway_sold_seats', JSON.stringify(Array.from(soldSeats)));
-            updateRevenueDisplay();
+        async function fetchRemoteData() {
+            if (API_URL.includes("PUT_YOUR_")) return;
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                if (data.sold && Array.isArray(data.sold)) {
+                    soldSeats = new Set(data.sold);
+                    renderGrid();
+                    document.getElementById('sync-status').className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                    document.getElementById('sync-status').innerText = '● Connected';
+                }
+            } catch (e) {
+                console.error(e);
+                document.getElementById('sync-status').className = 'text-xs px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30';
+                document.getElementById('sync-status').innerText = '● Sync Error';
+            }
         }
 
         function updateRevenueDisplay() {
             let total = 0;
             soldSeats.forEach(seatId => {
                 const zoneMatch = seatId.match(/^([A-Z]+)/);
-                if (zoneMatch) {
-                    const z = zoneMatch[1];
-                    if (zoneData[z]) total += zoneData[z].price;
+                if (zoneMatch && zoneData[zoneMatch[1]]) {
+                    total += zoneData[zoneMatch[1]].price;
                 }
             });
             document.getElementById('total-revenue').innerText = total.toLocaleString() + ' THB';
         }
 
-        function initGrids() {
+        function renderGrid() {
             for (const [zone, config] of Object.entries(zoneData)) {
                 const container = document.getElementById(`grid-${zone}`);
+                if (!container) continue;
                 container.innerHTML = '';
                 for (let i = 1; i <= config.count; i++) {
                     const seatId = `${zone}-${i < 10 ? '0' + i : i}`;
@@ -165,10 +160,10 @@
                     } else {
                         el.innerHTML = i;
                     }
-                    el.dataset.id = seatId;
-                    el.dataset.zone = zone;
-                    el.dataset.price = config.price;
-                    el.dataset.wb = config.wb;
+
+                    if (selectedSeatId === seatId) {
+                        el.classList.add('selected');
+                    }
 
                     el.addEventListener('click', () => {
                         if (el.classList.contains('sold')) return;
@@ -189,34 +184,42 @@
             updateRevenueDisplay();
         }
 
-        function confirmSale() {
+        async function confirmSale() {
             if (!selectedSeatId) return;
             if (confirm(`ยืนยันการขายโต๊ะ ${selectedSeatId} (สวม Wristband สี ${document.getElementById('target-wristband').innerText})?`)) {
-                soldSeats.add(selectedSeatId);
-                saveState();
-                
-                // รีเซ็ตหน้าจอเลือกฝั่งขวา
-                selectedSeatId = null;
-                document.getElementById('selected-seat-label').innerText = 'ยังไม่ได้เลือกโต๊ะ';
-                document.getElementById('target-wristband').innerText = '-';
-                document.getElementById('target-price').innerText = '0 THB';
-                document.getElementById('cust-note').value = '';
-                document.getElementById('btn-confirm').disabled = true;
-                
-                initGrids();
-                alert('✔️ บันทึกการขายเรียบร้อย! หยิบ Wristband สวมให้ลูกค้าได้เลย');
+                const btn = document.getElementById('btn-confirm');
+                btn.disabled = true;
+                btn.innerText = '⏳ กำลังซิงค์...';
+
+                try {
+                    await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ seatId: selectedSeatId })
+                    });
+                    
+                    soldSeats.add(selectedSeatId);
+                    selectedSeatId = null;
+                    document.getElementById('selected-seat-label').innerText = 'ยังไม่ได้เลือกโต๊ะ';
+                    document.getElementById('target-wristband').innerText = '-';
+                    document.getElementById('target-price').innerText = '0 THB';
+                    document.getElementById('cust-note').value = '';
+                    
+                    await fetchRemoteData();
+                    alert('✔️ บันทึกการขายเรียบร้อย! หยิบ Wristband สวมให้ลูกค้าได้เลย');
+                } catch(e) {
+                    alert('❌ เกิดข้อผิดพลาดในการซิงค์เน็ต กรุณาลองใหม่');
+                } finally {
+                    btn.innerText = '✅ ยืนยันการขาย & ออก Wristband';
+                }
             }
         }
 
-        function resetData() {
-            if (confirm('⚠️ ต้องการล้างข้อมูลการขายหน้างานทั้งหมดจริงไหม?')) {
-                localStorage.removeItem('runway_sold_seats');
-                soldSeats = new Set();
-                initGrids();
-            }
+        // โหลดครั้งแรก + วนลูปดึงข้อมูลทุก 4 วินาที
+        renderGrid();
+        if (!API_URL.includes("PUT_YOUR_")) {
+            fetchRemoteData();
+            setInterval(fetchRemoteData, 4000);
         }
-
-        initGrids();
     </script>
 </body>
 </html>
