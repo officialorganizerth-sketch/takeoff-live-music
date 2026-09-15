@@ -164,13 +164,33 @@
         }
         .map-image { width: 100%; border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.3); }
         .agent-badge { text-align: center; font-size: 0.8rem; color: var(--neon-blue); margin-bottom: 12px; display: none; }
+        
+        /* สไตล์กล่อง Agenda */
+        .agenda-box {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        .agenda-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            font-size: 0.88rem;
+        }
+        .agenda-item:last-child { border-bottom: none; }
+        .agenda-time { color: var(--neon-blue); font-weight: 600; white-space: nowrap; margin-right: 10px; }
+        .agenda-event { color: #fff; text-align: right; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('book', this)">จองบัตร</button>
-            <button class="tab-btn" onclick="switchTab('map', this)">ผังที่นั่ง</button>
+            <button class="tab-btn" onclick="switchTab('map', this)">ผังงาน & กำหนดการ</button>
             <button class="tab-btn" onclick="switchTab('search', this)">ค้นหาบัตร</button>
         </div>
 
@@ -264,11 +284,44 @@
             </div>
         </div>
 
-        <!-- หน้าผังที่นั่ง -->
+        <!-- หน้าผังที่นั่งและกำหนดการ -->
         <div id="mapTab" class="tab-content">
             <h2 style="color: var(--neon-blue); text-align: center; margin-bottom: 15px;">🗺️ ผังโซนและที่นั่ง</h2>
-            <div style="text-align: center;">
+            <div style="text-align: center; margin-bottom: 20px;">
                 <img src="https://cdn.phototourl.com/free/2026-09-15-83d719f1-133a-46b2-a351-91dedca6d399.png?v=99" alt="Seating Map" class="map-image">
+            </div>
+
+            <!-- ส่วนกำหนดการ (Agenda) -->
+            <h2 style="color: var(--neon-pink); text-align: center; margin-bottom: 10px; font-size: 1.2rem; text-shadow: 0 0 8px rgba(255, 0, 255, 0.4);">⏰ กำหนดการงานแสดง (Agenda)</h2>
+            <div class="agenda-box">
+                <div class="agenda-item">
+                    <span class="agenda-time">15.00 - 16.00 น.</span>
+                    <span class="agenda-event">🚪 ประตูเปิด</span>
+                </div>
+                <div class="agenda-item">
+                    <span class="agenda-time">16.15 - 17.45 น.</span>
+                    <span class="agenda-event">🎵 Housebrand</span>
+                </div>
+                <div class="agenda-item">
+                    <span class="agenda-time">17.45 - 18.00 น.</span>
+                    <span class="agenda-event">🎤 พิธีกรเปิดงาน</span>
+                </div>
+                <div class="agenda-item">
+                    <span class="agenda-time">18.00 - 20.00 น.</span>
+                    <span class="agenda-event">🎸 วง Aucsara</span>
+                </div>
+                <div class="agenda-item">
+                    <span class="agenda-time">20.15 - 21.15 น.</span>
+                    <span class="agenda-event">🎸 วง Zeal</span>
+                </div>
+                <div class="agenda-item">
+                    <span class="agenda-time">21.30 - 22.30 น.</span>
+                    <span class="agenda-event">🎸 วง BodySlam</span>
+                </div>
+                <div class="agenda-item">
+                    <span class="agenda-time">22.45 - 00.00 น.</span>
+                    <span class="agenda-event">🎵 วง HeelBrand</span>
+                </div>
             </div>
         </div>
 
@@ -278,7 +331,7 @@
             <div class="form-group">
                 <label>เบอร์โทรศัพท์</label>
                 <input type="tel" id="searchInput" placeholder="8xxxxxxxx">
-                <div style="font-size: 0.78rem; color: var(--neon-blue); margin-top: 5px;">*ไม่ต้องใส่เลข 0 ตัวหน้า</div>
+                <div style="font-size: 0.78rem; color: var(--neon-blue); margin-top: 5px;">* รองรับทั้งใส่เลข 0 และไม่ใส่เลข 0 ตัวหน้า</div>
             </div>
             <button type="button" class="btn-submit" onclick="searchTicket()">ค้นหาข้อมูลตั๋ว</button>
             <div id="searchResult" class="result-box">
@@ -432,7 +485,7 @@
                 name: name,
                 phone: phone,
                 tableNo: selectionDetail,
-                zone: zone, // ส่งค่า zone เพื่อเช็กซ้ำฝั่ง Apps Script
+                zone: zone,
                 tickets: ticketsArr,
                 agent: currentAgent
             };
