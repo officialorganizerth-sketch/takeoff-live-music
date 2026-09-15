@@ -176,17 +176,14 @@
 
         <!-- หน้าจองบัตร -->
         <div id="bookTab" class="tab-content active">
-            <!-- 🖼️ บรรทัดที่ 1: โลโก้รูป (ขนาดใหญ่ขึ้น max-height: 150px) -->
             <div style="text-align: center; margin-bottom: 12px;">
                 <img src="https://cdn.phototourl.com/free/2026-09-14-a3a7d279-fd79-4dde-aa90-acd4056f1198.png" alt="Concert Logo" style="max-height: 150px; width: 100%; max-width: 320px; object-fit: contain; border-radius: 10px;">
             </div>
             
-            <!-- 🎸 บรรทัดที่ 2: ZEAL × BODYSLAM -->
             <h2 style="color: var(--neon-pink); text-align: center; margin-bottom: 6px; text-shadow: 0 0 10px rgba(255, 0, 255, 0.5); font-size: 1.35rem;">
                  ZEAL × BODYSLAM
             </h2>
             
-            <!-- 📅 บรรทัดที่ 3: วันที่ 1 ตุลาคม 2569 -->
             <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
                 📅 1 ตุลาคม 2569
             </p>
@@ -221,13 +218,11 @@
                     </select>
                 </div>
 
-                <!-- กล่องสรุปยอดชำระสุทธิ -->
                 <div style="background: rgba(0, 240, 255, 0.08); border: 1px solid var(--neon-blue); border-radius: 10px; padding: 12px 15px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center;">
                     <span style="font-size: 0.9rem; color: var(--text-muted);">ยอดชำระสุทธิ:</span>
                     <span id="totalPriceText" style="font-size: 1.1rem; font-weight: bold; color: var(--neon-blue);">0 บาท</span>
                 </div>
 
-                <!-- กล่องเลขบัญชี SCB -->
                 <div style="background: rgba(255,255,255,0.05); border: 1px dashed rgba(0, 240, 255, 0.4); border-radius: 12px; padding: 15px; margin: 15px 0; color: #fff;">
                     <div style="font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; color: #00ffff;">
                         💳 ช่องทางชำระเงิน / Bank Transfer
@@ -273,7 +268,7 @@
         <div id="mapTab" class="tab-content">
             <h2 style="color: var(--neon-blue); text-align: center; margin-bottom: 15px;">🗺️ ผังโซนและที่นั่ง</h2>
             <div style="text-align: center;">
-                <img src="https://cdn.phototourl.com/free/2026-09-15-83d719f1-133a-46b2-a351-91dedca6d399.png" alt="Seating Map" class="map-image">
+                <img src="https://cdn.phototourl.com/free/2026-09-15-83d719f1-133a-46b2-a351-91dedca6d399.png?v=99" alt="Seating Map" class="map-image">
             </div>
         </div>
 
@@ -283,7 +278,7 @@
             <div class="form-group">
                 <label>เบอร์โทรศัพท์</label>
                 <input type="tel" id="searchInput" placeholder="8xxxxxxxx">
-                <div style="font-size: 0.78rem; color: var(--neon-blue); margin-top: 5px;">* ไม่ต้องใส่เลข 0 ตัวหน้า (เช่น 8xxxxxxxx)</div>
+                <div style="font-size: 0.78rem; color: var(--neon-blue); margin-top: 5px;">* รองรับทั้งใส่เลข 0 และไม่ใส่เลข 0 ตัวหน้า</div>
             </div>
             <button type="button" class="btn-submit" onclick="searchTicket()">ค้นหาข้อมูลตั๋ว</button>
             <div id="searchResult" class="result-box">
@@ -471,10 +466,15 @@
         }
 
         async function searchTicket() {
-            const searchInput = document.getElementById("searchInput")?.value.trim() || "";
+            let searchInput = document.getElementById("searchInput")?.value.trim() || "";
             const resBox = document.getElementById("searchResult");
             const qrContainer = document.getElementById("searchQrContainer");
             if (!searchInput) { alert("กรุณากรอกเบอร์โทรศัพท์"); return; }
+            
+            if (searchInput.startsWith("0")) {
+                searchInput = searchInput.substring(1);
+            }
+
             try {
                 qrContainer.innerHTML = "<p style='text-align:center;'>กำลังค้นหาข้อมูล...</p>";
                 resBox.style.display = "block";
