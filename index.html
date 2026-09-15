@@ -251,7 +251,7 @@
                         โอนเงินแล้ว แต่ขอส่งสลิปทาง LINE แทน
                     </label>
                 </div>
-                <button type="submit" class="btn-submit">ยืนยันการจอง</button>
+                <button type="submit" id="submitBtn" class="btn-submit">ยืนยันการจอง</button>
             </form>
 
             <div id="successTicket" class="ticket-card">
@@ -288,7 +288,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwmiWKohvrD52Ye9hRRAx1LdZf10JdllFAmKA2IDtNQFNeywu0XlbIJLvfQeMeucaDSzA/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsSNpW1sby2jH4poVpujA6ye5r4e7LbHTCTf-ZHrF8xax5CKqLW2Flx1G851vBSLiy/exec";
         const tableOptions = {
             "ZONE VIP": Array.from({length: 40}, (_, i) => "VIP" + (i + 1)),
             "ZONE A": Array.from({length: 40}, (_, i) => "A" + (i + 1)),
@@ -409,6 +409,7 @@
             const zone = document.getElementById("zone").value;
             const isLine = document.getElementById("lineSlip").checked;
             const fileInput = document.getElementById("slipFile");
+            const submitBtn = document.getElementById("submitBtn");
 
             if (!isLine && fileInput.files.length === 0) {
                 alert("กรุณาแนบสลิป หรือเลือกติ๊กช่องส่งสลิปทาง LINE ครับ");
@@ -431,6 +432,7 @@
                 name: name,
                 phone: phone,
                 tableNo: selectionDetail,
+                zone: zone, // ส่งค่า zone เพื่อเช็กซ้ำฝั่ง Apps Script
                 tickets: ticketsArr,
                 agent: currentAgent
             };
@@ -443,8 +445,13 @@
             }
 
             try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = "กำลังตรวจสอบและบันทึก...";
                 const response = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
                 const result = await response.json();
+                submitBtn.disabled = false;
+                submitBtn.textContent = "ยืนยันการจอง";
+
                 if (result.status === "success") {
                     document.getElementById("bookingForm").style.display = "none";
                     document.getElementById("sucBookingId").textContent = bookingId;
@@ -458,9 +465,11 @@
                     document.getElementById("sucQrContainer").innerHTML = qrHtml;
                     document.getElementById("successTicket").style.display = "block";
                 } else {
-                    alert("❌ เกิดข้อผิดพลาด: " + result.message);
+                    alert("❌ " + (result.message || "เกิดข้อผิดพลาดในการจอง"));
                 }
             } catch (err) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "ยืนยันการจอง";
                 alert("❌ ส่งข้อมูลไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
             }
         }
