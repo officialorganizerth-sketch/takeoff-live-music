@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Runway Box Office - Realtime Sync</title>
+    <title>Runway Box Office - Full Realtime Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -12,56 +12,105 @@
         .seat:hover:not(.sold) { transform: scale(1.1); box-shadow: 0 0 10px rgba(255,255,255,0.5); }
         .seat.sold { background-color: #ef4444 !important; border-color: #dc2626 !important; cursor: not-allowed; opacity: 0.8; }
         .seat.selected { outline: 3px solid #38bdf8; transform: scale(1.15); z-index: 10; }
+        .standing-card { transition: all 0.2s; }
+        .standing-card:hover { border-color: #a855f7; }
     </style>
 </head>
 <body class="p-4 md:p-6">
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <div class="lg:col-span-3 bg-slate-800/80 p-4 md:p-6 rounded-2xl border border-slate-700 shadow-xl">
-            <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
-                <div>
-                    <h1 class="text-xl md:text-2xl font-bold text-amber-400">🎟️ RUNWAY BOX OFFICE (Realtime Sync)</h1>
-                    <p class="text-xs text-slate-400">ซิงค์ข้อมูลผ่าน Google Sheets อัตโนมัติทุก 4 วินาที</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span id="sync-status" class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">● Connected</span>
-                    <button onclick="fetchRemoteData()" class="text-xs px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded-lg text-white">🔄 รีเฟรชสด</button>
-                </div>
-            </div>
-
-            <div class="w-full bg-slate-900 border-2 border-amber-500/50 text-center py-2 rounded-xl mb-6 font-bold tracking-widest text-amber-400 shadow-inner">
-                ✨ STAGE (เวที) ✨
-            </div>
-
-            <div class="space-y-6 overflow-x-auto pb-4">
-                <div>
-                    <div class="text-xs font-semibold text-amber-400 mb-2">ZONE VIP (3,999 THB / 4 Pts)</div>
-                    <div class="grid grid-cols-10 sm:grid-cols-20 gap-1.5" id="grid-VIP"></div>
-                </div>
-                <div>
-                    <div class="text-xs font-semibold text-pink-400 mb-2">ZONE A (2,800 THB / 4 Pts)</div>
-                    <div class="grid grid-cols-10 sm:grid-cols-20 gap-1.5" id="grid-A"></div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- ฝั่งซ้าย: ผังคอนเสิร์ต (โซนโต๊ะ + โซนยืน) -->
+        <div class="lg:col-span-3 space-y-6">
+            
+            <div class="bg-slate-800/80 p-4 md:p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
                     <div>
-                        <div class="text-xs font-semibold text-sky-400 mb-2">ZONE B (2,600 THB)</div>
-                        <div class="grid grid-cols-10 gap-1.5" id="grid-B"></div>
+                        <h1 class="text-xl md:text-2xl font-bold text-amber-400">🎟️ TAKE OFF BOX OFFICE</h1>
+                        <p class="text-xs text-slate-400">ซิงค์สด Realtime | โต๊ะนั่ง & บัตรยืน</p>
                     </div>
-                    <div>
-                        <div class="text-xs font-semibold text-emerald-400 mb-2">ZONE C (2,600 THB)</div>
-                        <div class="grid grid-cols-10 gap-1.5" id="grid-C"></div>
+                    <div class="flex items-center gap-2">
+                        <span id="sync-status" class="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">● Connected</span>
+                        <button onclick="fetchRemoteData()" class="text-xs px-3 py-1 bg-slate-700 hover:bg-slate-600 rounded-lg text-white">🔄 รีเฟรชสด</button>
                     </div>
                 </div>
-                <div>
-                    <div class="text-xs font-semibold text-orange-400 mb-2">ZONE D (2,400 THB)</div>
-                    <div class="grid grid-cols-10 sm:grid-cols-25 gap-1.5" id="grid-D"></div>
+
+                <!-- Legend สี Wristband -->
+                <div class="flex flex-wrap gap-2 text-xs mb-6 pb-4 border-b border-slate-700">
+                    <span class="px-2 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">VIP (ทอง)</span>
+                    <span class="px-2 py-1 rounded bg-pink-500/20 text-pink-300 border border-pink-500/40">Zone A (ชมพู)</span>
+                    <span class="px-2 py-1 rounded bg-sky-500/20 text-sky-300 border border-sky-500/40">Zone B (ฟ้า)</span>
+                    <span class="px-2 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">Zone C (เขียว)</span>
+                    <span class="px-2 py-1 rounded bg-orange-500/20 text-orange-300 border border-orange-500/40">Zone D (ส้ม)</span>
+                    <span class="px-2 py-1 rounded bg-purple-500/20 text-purple-300 border border-purple-500/40">Standing L,R (ม่วง) 590฿</span>
                 </div>
+
+                <!-- STAGE -->
+                <div class="w-full bg-slate-900 border-2 border-amber-500/50 text-center py-2 rounded-xl mb-6 font-bold tracking-widest text-amber-400 shadow-inner">
+                    ✨ STAGE (เวที) ✨
+                </div>
+
+                <!-- ผังโซนโต๊ะนั่ง VIP, A, B, C, D -->
+                <div class="space-y-6 overflow-x-auto pb-4">
+                    <div>
+                        <div class="text-xs font-semibold text-amber-400 mb-2">ZONE VIP (3,999 THB / 4 Pts)</div>
+                        <div class="grid grid-cols-10 sm:grid-cols-20 gap-1.5" id="grid-VIP"></div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-pink-400 mb-2">ZONE A (2,800 THB / 4 Pts)</div>
+                        <div class="grid grid-cols-10 sm:grid-cols-20 gap-1.5" id="grid-A"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <div class="text-xs font-semibold text-sky-400 mb-2">ZONE B (2,600 THB)</div>
+                            <div class="grid grid-cols-10 gap-1.5" id="grid-B"></div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-semibold text-emerald-400 mb-2">ZONE C (2,600 THB)</div>
+                            <div class="grid grid-cols-10 gap-1.5" id="grid-C"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-xs font-semibold text-orange-400 mb-2">ZONE D (2,400 THB)</div>
+                        <div class="grid grid-cols-10 sm:grid-cols-25 gap-1.5" id="grid-D"></div>
+                    </div>
+                </div>
+
+                <!-- โซนบัตรยืน (Standing L & R) -->
+                <div class="mt-8 pt-6 border-t border-slate-700">
+                    <div class="text-xs font-semibold text-purple-400 mb-3">🧍‍♂️ บัตรยืนหน้างาน (STANDING ZONE L, R | 590 THB / ท่าน | Wristband สีม่วง)</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Standing L -->
+                        <div class="standing-card bg-slate-900/60 p-4 rounded-xl border border-purple-500/30 flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-white text-sm">STANDING ZONE L (ซ้าย)</div>
+                                <div class="text-xs text-slate-400">ขายแล้ว: <span id="count-standingL" class="text-purple-400 font-bold">0</span> ท่าน</div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="qty-standingL" value="1" min="1" max="10" class="w-14 bg-slate-800 border border-slate-700 rounded-lg text-center text-white text-sm py-1">
+                                <button onclick="buyStanding('L')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg shadow transition">+ ขายยืนซ้าย</button>
+                            </div>
+                        </div>
+                        <!-- Standing R -->
+                        <div class="standing-card bg-slate-900/60 p-4 rounded-xl border border-purple-500/30 flex justify-between items-center">
+                            <div>
+                                <div class="font-bold text-white text-sm">STANDING ZONE R (ขวา)</div>
+                                <div class="text-xs text-slate-400">ขายแล้ว: <span id="count-standingR" class="text-purple-400 font-bold">0</span> ท่าน</div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="qty-standingR" value="1" min="1" max="10" class="w-14 bg-slate-800 border border-slate-700 rounded-lg text-center text-white text-sm py-1">
+                                <button onclick="buyStanding('R')" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold rounded-lg shadow transition">+ ขายยืนขวา</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
+        <!-- ฝั่งขวา: แผงชำระเงินโต๊ะ & สรุปยอดรวมอัตโนมัติ -->
         <div class="bg-slate-800/90 p-5 rounded-2xl border border-slate-700 shadow-xl flex flex-col justify-between">
             <div>
-                <h2 class="text-lg font-bold text-white mb-4 border-b border-slate-700 pb-2">🛒 ทำรายการขายหน้างาน</h2>
+                <h2 class="text-lg font-bold text-white mb-4 border-b border-slate-700 pb-2">🛒 ทำรายการโต๊ะนั่ง</h2>
                 
                 <div class="space-y-4 text-sm">
                     <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-700">
@@ -86,15 +135,26 @@
                 </div>
             </div>
 
-            <div class="mt-6 space-y-4">
-                <div class="flex justify-between text-xs text-slate-400 bg-slate-900/40 p-3 rounded-lg">
-                    <span>ยอดขายรวมหน้างาน:</span>
-                    <span id="total-revenue" class="font-bold text-white">0 THB</span>
+            <!-- สรุปสถิติ & ปุ่มยืนยัน (รวมโต๊ะ + บัตรยืน) -->
+            <div class="mt-6 space-y-4 pt-4 border-t border-slate-700">
+                <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-700 space-y-1.5 text-xs">
+                    <div class="flex justify-between text-slate-400">
+                        <span>ยอดยืนรวม (L+R):</span>
+                        <span id="summary-standing-rev" class="text-purple-300">0 THB</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>ยอดโต๊ะนั่งรวม:</span>
+                        <span id="summary-table-rev" class="text-amber-300">0 THB</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-sm pt-1 border-t border-slate-800">
+                        <span class="text-white">รวมยอดขายทั้งหมด:</span>
+                        <span id="total-revenue" class="text-emerald-400 text-base">0 THB</span>
+                    </div>
                 </div>
 
                 <button id="btn-confirm" onclick="confirmSale()" disabled 
                     class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-bold rounded-xl shadow-lg transition text-base">
-                    ✅ ยืนยันการขาย & ออก Wristband
+                    ✅ ยืนยันการขายโต๊ะ & ออก Wristband
                 </button>
             </div>
         </div>
@@ -102,7 +162,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbz9wMUrfpTKGGPlEtxuppH6M0LdspqLU6qKFqkjBeVfXMGRFJSiMqgr9iGbbYCCVKOz/exec"; // <--- เปลี่ยนตรงนี้เป็น URL ที่ได้จาก GAS
+        const API_URL = "https://script.google.com/macros/library/d/1fCXkS_zQ1HioYxG2JWUMXskr4dZmo01Eb_vK3EDzXlQ325eUNCJCmIb0/4"; // <--- ใส่ URL GAS ของคุณ
         
         const zoneData = {
             'VIP': { count: 20, price: 3999, color: 'bg-amber-500/30 border-amber-500/60 text-amber-200', wb: 'ทอง (Gold)' },
@@ -114,19 +174,22 @@
 
         let selectedSeatId = null;
         let selectedZone = null;
-        let soldSeats = new Set();
+        let remoteState = { sold: [], standingL: 0, standingR: 0 };
 
         async function fetchRemoteData() {
             if (API_URL.includes("PUT_YOUR_")) return;
             try {
                 const res = await fetch(API_URL);
                 const data = await res.json();
-                if (data.sold && Array.isArray(data.sold)) {
-                    soldSeats = new Set(data.sold);
-                    renderGrid();
-                    document.getElementById('sync-status').className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
-                    document.getElementById('sync-status').innerText = '● Connected';
-                }
+                remoteState.sold = Array.isArray(data.sold) ? data.sold : [];
+                remoteState.standingL = Number(data.standingL) || 0;
+                remoteState.standingR = Number(data.standingR) || 0;
+                
+                renderGrid();
+                renderStanding();
+                updateRevenueDisplay();
+                document.getElementById('sync-status').className = 'text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+                document.getElementById('sync-status').innerText = '● Connected';
             } catch (e) {
                 console.error(e);
                 document.getElementById('sync-status').className = 'text-xs px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30';
@@ -134,18 +197,31 @@
             }
         }
 
+        function renderStanding() {
+            document.getElementById('count-standingL').innerText = remoteState.standingL;
+            document.getElementById('count-standingR').innerText = remoteState.standingR;
+        }
+
         function updateRevenueDisplay() {
-            let total = 0;
-            soldSeats.forEach(seatId => {
+            let tableTotal = 0;
+            const soldSet = new Set(remoteState.sold);
+            soldSet.forEach(seatId => {
                 const zoneMatch = seatId.match(/^([A-Z]+)/);
                 if (zoneMatch && zoneData[zoneMatch[1]]) {
-                    total += zoneData[zoneMatch[1]].price;
+                    tableTotal += zoneData[zoneMatch[1]].price;
                 }
             });
-            document.getElementById('total-revenue').innerText = total.toLocaleString() + ' THB';
+
+            const standingTotal = (remoteState.standingL + remoteState.standingR) * 590;
+            const grandTotal = tableTotal + standingTotal;
+
+            document.getElementById('summary-table-rev').innerText = tableTotal.toLocaleString() + ' THB';
+            document.getElementById('summary-standing-rev').innerText = standingTotal.toLocaleString() + ' THB';
+            document.getElementById('total-revenue').innerText = grandTotal.toLocaleString() + ' THB';
         }
 
         function renderGrid() {
+            const soldSet = new Set(remoteState.sold);
             for (const [zone, config] of Object.entries(zoneData)) {
                 const container = document.getElementById(`grid-${zone}`);
                 if (!container) continue;
@@ -154,7 +230,7 @@
                     const seatId = `${zone}-${i < 10 ? '0' + i : i}`;
                     const el = document.createElement('div');
                     el.className = `seat text-center py-1.5 px-1 rounded-lg border text-xs font-semibold ${config.color}`;
-                    if (soldSeats.has(seatId)) {
+                    if (soldSet.has(seatId)) {
                         el.classList.add('sold');
                         el.innerHTML = `✕`;
                     } else {
@@ -181,7 +257,6 @@
                     container.appendChild(el);
                 }
             }
-            updateRevenueDisplay();
         }
 
         async function confirmSale() {
@@ -197,7 +272,6 @@
                         body: JSON.stringify({ seatId: selectedSeatId })
                     });
                     
-                    soldSeats.add(selectedSeatId);
                     selectedSeatId = null;
                     document.getElementById('selected-seat-label').innerText = 'ยังไม่ได้เลือกโต๊ะ';
                     document.getElementById('target-wristband').innerText = '-';
@@ -205,12 +279,29 @@
                     document.getElementById('cust-note').value = '';
                     
                     await fetchRemoteData();
-                    alert('✔️ บันทึกการขายเรียบร้อย! หยิบ Wristband สวมให้ลูกค้าได้เลย');
+                    alert('✔️ บันทึกการขายโต๊ะเรียบร้อย! หยิบ Wristband สวมให้ลูกค้าได้เลย');
                 } catch(e) {
                     alert('❌ เกิดข้อผิดพลาดในการซิงค์เน็ต กรุณาลองใหม่');
                 } finally {
-                    btn.innerText = '✅ ยืนยันการขาย & ออก Wristband';
+                    btn.innerText = '✅ ยืนยันการขายโต๊ะ & ออก Wristband';
                 }
+            }
+        }
+
+        async function buyStanding(zone) {
+            const inputId = zone === 'L' ? 'qty-standingL' : 'qty-standingR';
+            const qty = Number(document.getElementById(inputId).value) || 1;
+            if (!confirm(`ยืนยันขายบัตรยืน Zone ${zone} จำนวน ${qty} ท่าน (รวม ${qty * 590} บาท, Wristband สีม่วง)?`)) return;
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'buyStanding', zone: zone, qty: qty })
+                });
+                await fetchRemoteData();
+                alert(`✔️ บันทึกบัตรยืน Zone ${zone} จำนวน ${qty} ท่านเรียบร้อย! สวม Wristband สีม่วงให้ลูกค้า`);
+            } catch(e) {
+                alert('❌ เกิดข้อผิดพลาดในการซิงค์บัตรยืน');
             }
         }
 
