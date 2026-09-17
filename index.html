@@ -179,7 +179,7 @@
         <!-- หน้าจองบัตร -->
         <div id="bookTab" class="tab-content active">
             <div style="text-align: center; margin-bottom: 12px;">
-                <img src="https://cdn.phototourl.com/free/2026-09-14-a3a7d279-fd79-4dde-aa90-acd4056f1198.png" alt="Concert Logo" style="max-height: 150px; width: 100%; max-width: 320px; object-fit: contain; border-radius: 10px;">
+                <img src="https://cdn.phototourl.com/free/2026-09-17-d92b4cab-b43b-4356-b746-1a9ee0ad30cf.jpg" alt="Concert Logo" style="max-height: 150px; width: 100%; max-width: 320px; object-fit: contain; border-radius: 10px;">
             </div>
             
             <h2 style="color: var(--neon-pink); text-align: center; margin-bottom: 6px; text-shadow: 0 0 10px rgba(255, 0, 255, 0.5); font-size: 1.35rem;">
@@ -310,13 +310,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const currentAgent = urlParams.get('agent') ? urlParams.get('agent').toUpperCase() : "DIRECT";
         
-        // ถ้าเปิดลิงก์ตัวแทน ให้แสดงชื่อตัวแทนที่แบนเนอร์ด้านบนตามปกติ (ไม่ล็อกปุ่ม/ไม่เด้งเตือนแล้ว)
         if (currentAgent !== "DIRECT") {
             document.getElementById('agentBanner').style.display = 'block';
             document.getElementById('agentNameDisplay').textContent = currentAgent;
         }
 
-        // ดึงรายการโต๊ะที่ถูกจองแล้วจาก Google Sheets มาตัดออกจาก Dropdown
+        // ดึงรายการโต๊ะที่ถูกจองแล้วจาก Google Sheets มาตัดออกจาก Dropdown ทันทีที่โหลดหน้าเว็บ
         async function fetchBookedTables() {
             try {
                 const response = await fetch(SCRIPT_URL + "?action=getBookedTables");
@@ -385,6 +384,7 @@
                 if (zoneSelect && allTableOptions[zoneSelect]) {
                     const tableSelect = document.getElementById("tableNo");
                     allTableOptions[zoneSelect].forEach(table => {
+                        // เช็กว่าโต๊ะนี้ถูกจองไปหรือยัง ถ้าจองแล้วจะไม่นำมาใส่ใน Dropdown
                         const isBooked = bookedTablesList.some(booked => booked.includes(table));
                         if (!isBooked) {
                             let opt = document.createElement("option");
