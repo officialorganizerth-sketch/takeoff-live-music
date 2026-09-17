@@ -6,7 +6,7 @@
     <title>TAKEOFF LIVE MUSIC | จองบัตรและตรวจสอบสิทธิ์</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-       :root {
+        :root {
             --bg-color: #05050c;
             --card-bg: rgba(15, 15, 30, 0.85);
             --neon-blue: #00ffff;
@@ -127,7 +127,7 @@
             margin-top: 10px;
         }
         #fileName { margin-top: 4px; font-size: 0.8rem; color: var(--neon-blue); }
-        .result-box {
+        .result-box, .ticket-card {
             margin-top: 20px;
             background: rgba(0, 240, 255, 0.05);
             border: 1px solid rgba(0, 240, 255, 0.2);
@@ -135,37 +135,19 @@
             border-radius: 10px;
             display: none;
         }
-        .ticket-card {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--neon-blue);
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
-        }
+        .ticket-card { background: rgba(0, 0, 0, 0.4); border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 255, 255, 0.2); }
         .qr-item {
             text-align: center;
             background: rgba(255, 255, 255, 0.05);
             padding: 10px;
             border-radius: 10px;
-            margin-top: 10px;
+            margin: 6px;
             border: 1px dashed rgba(0, 240, 255, 0.3);
             display: inline-block;
-            margin: 6px;
         }
-        .qr-item img {
-            margin-top: 8px;
-            border-radius: 6px;
-            background: #fff;
-            padding: 6px;
-            width: 110px;
-            height: 110px;
-        }
+        .qr-item img { margin-top: 8px; border-radius: 6px; background: #fff; padding: 6px; width: 110px; height: 110px; }
         .map-image { width: 100%; border-radius: 10px; border: 1px solid rgba(0, 240, 255, 0.3); }
         .agent-badge { text-align: center; font-size: 0.8rem; color: var(--neon-blue); margin-bottom: 12px; display: none; }
-        
-        /* สไตล์กล่อง Agenda */
         .agenda-box {
             background: rgba(0, 0, 0, 0.4);
             border: 1px solid rgba(0, 240, 255, 0.3);
@@ -201,12 +183,9 @@
             </div>
             
             <h2 style="color: var(--neon-pink); text-align: center; margin-bottom: 6px; text-shadow: 0 0 10px rgba(255, 0, 255, 0.5); font-size: 1.35rem;">
-                 ZEAL × BODYSLAM
+                ZEAL × BODYSLAM
             </h2>
-            
-            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
-                📅 1 ตุลาคม 2569
-            </p>
+            <p style="text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">📅 1 ตุลาคม 2569</p>
 
             <div id="agentBanner" class="agent-badge">🎫 จองผ่านช่องทางตัวแทน: <span id="agentNameDisplay">-</span></div>
 
@@ -232,7 +211,7 @@
                     </select>
                 </div>
                 <div class="form-group" id="dynamicFieldGroup">
-                    <label id="dynamicLabel">เลือกหมายเลขโต๊ะ</label>
+                    <label>เลือกหมายเลขโต๊ะ</label>
                     <select id="tableNo" required>
                         <option value="">-- กรุณาเลือกโซนก่อน --</option>
                     </select>
@@ -244,18 +223,13 @@
                 </div>
 
                 <div style="background: rgba(255,255,255,0.05); border: 1px dashed rgba(0, 240, 255, 0.4); border-radius: 12px; padding: 15px; margin: 15px 0; color: #fff;">
-                    <div style="font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; color: #00ffff;">
-                        💳 ช่องทางชำระเงิน / Bank Transfer
-                    </div>
+                    <div style="font-size: 0.95rem; font-weight: bold; margin-bottom: 10px; color: #00ffff;">💳 ช่องทางชำระเงิน / Bank Transfer</div>
                     <p style="margin: 5px 0; font-size: 0.85rem; color: #ccc;">ธนาคาร: <strong>ไทยพาณิชย์ (SCB)</strong></p>
                     <p style="margin: 5px 0; font-size: 0.85rem; color: #ccc;">ชื่อบัญชี: <strong>บริษัท เสริมสุข คอนสตรัคชั่น 1828 จำกัด</strong></p>
-                    
                     <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid rgba(0, 240, 255, 0.3); padding: 10px 12px; border-radius: 8px; margin-top: 10px;">
                         <span style="font-size: 0.85rem; color: #94a3b8;">เลขบัญชี:</span>
                         <input type="text" id="accNum" value="160-435642-7" readonly style="background: transparent; border: none; color: #00ffff; font-size: 0.95rem; font-weight: bold; width: 130px; outline: none; text-align: center;">
-                        <button type="button" onclick="copyAccNum()" style="background: #00ffff; color: #000; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">
-                            📋 คัดลอก
-                        </button>
+                        <button type="button" onclick="copyAccNum()" style="background: #00ffff; color: #000; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem; font-weight: 600;">📋 คัดลอก</button>
                     </div>
                 </div>
 
@@ -290,38 +264,15 @@
             <div style="text-align: center; margin-bottom: 20px;">
                 <img src="https://cdn.phototourl.com/free/2026-09-15-83d719f1-133a-46b2-a351-91dedca6d399.png?v=99" alt="Seating Map" class="map-image">
             </div>
-
-            <!-- ส่วนกำหนดการ (Agenda) -->
             <h2 style="color: var(--neon-pink); text-align: center; margin-bottom: 10px; font-size: 1.2rem; text-shadow: 0 0 8px rgba(255, 0, 255, 0.4);">⏰ กำหนดการงานแสดง (Agenda)</h2>
             <div class="agenda-box">
-                <div class="agenda-item">
-                    <span class="agenda-time">15.00 - 16.00 น.</span>
-                    <span class="agenda-event">🚪 ประตูเปิด</span>
-                </div>
-                <div class="agenda-item">
-                    <span class="agenda-time">16.15 - 17.45 น.</span>
-                    <span class="agenda-event">🎵 Housebrand</span>
-                </div>
-                <div class="agenda-item">
-                    <span class="agenda-time">17.45 - 18.00 น.</span>
-                    <span class="agenda-event">🎤 พิธีกรเปิดงาน</span>
-                </div>
-                <div class="agenda-item">
-                    <span class="agenda-time">18.00 - 20.00 น.</span>
-                    <span class="agenda-event">🎸 วง Aucsara</span>
-                </div>
-                <div class="agenda-item">
-                    <span class="agenda-time">20.15 - 21.15 น.</span>
-                    <span class="agenda-event">🎸 วง Zeal</span>
-                </div>
-                <div class="agenda-item">
-                    <span class="agenda-time">21.30 - 22.30 น.</span>
-                    <span class="agenda-event">🎸 วง BodySlam</span>
-                </div>
-                <div class="agenda-item">
-                    <span class="agenda-time">22.45 - 00.00 น.</span>
-                    <span class="agenda-event">🎵 วง HeelBrand</span>
-                </div>
+                <div class="agenda-item"><span class="agenda-time">15.00 - 16.00 น.</span><span class="agenda-event">🚪 ประตูเปิด</span></div>
+                <div class="agenda-item"><span class="agenda-time">16.15 - 17.45 น.</span><span class="agenda-event">🎵 Housebrand</span></div>
+                <div class="agenda-item"><span class="agenda-time">17.45 - 18.00 น.</span><span class="agenda-event">🎤 พิธีกรเปิดงาน</span></div>
+                <div class="agenda-item"><span class="agenda-time">18.00 - 20.00 น.</span><span class="agenda-event">🎸 วง Aucsara</span></div>
+                <div class="agenda-item"><span class="agenda-time">20.15 - 21.15 น.</span><span class="agenda-event">🎸 วง Zeal</span></div>
+                <div class="agenda-item"><span class="agenda-time">21.30 - 22.30 น.</span><span class="agenda-event">🎸 วง BodySlam</span></div>
+                <div class="agenda-item"><span class="agenda-time">22.45 - 00.00 น.</span><span class="agenda-event">🎵 วง HeelBrand</span></div>
             </div>
         </div>
 
@@ -334,15 +285,14 @@
                 <div style="font-size: 0.78rem; color: var(--neon-blue); margin-top: 5px;">* รองรับทั้งใส่เลข 0 และไม่ใส่เลข 0 ตัวหน้า</div>
             </div>
             <button type="button" class="btn-submit" onclick="searchTicket()">ค้นหาข้อมูลตั๋ว</button>
-            <div id="searchResult" class="result-box">
-                <div id="searchQrContainer"></div>
-            </div>
+            <div id="searchResult" class="result-box"><div id="searchQrContainer"></div></div>
         </div>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxsSNpW1sby2jH4poVpujA6ye5r4e7LbHTCTf-ZHrF8xax5CKqLW2Flx1G851vBSLiy/exec";
-        const tableOptions = {
+        
+        const allTableOptions = {
             "ZONE VIP": Array.from({length: 40}, (_, i) => "VIP" + (i + 1)),
             "ZONE A": Array.from({length: 40}, (_, i) => "A" + (i + 1)),
             "ZONE B": Array.from({length: 30}, (_, i) => "B" + (i + 1)),
@@ -351,14 +301,11 @@
             "โซนยืน": ["โซนยืน"]
         };
         const zonePrices = {
-            "ZONE VIP": 3999,
-            "ZONE A": 2800,
-            "ZONE B": 2600,
-            "ZONE C": 2600,
-            "ZONE D": 2400,
-            "โซนยืน": 590
+            "ZONE VIP": 3999, "ZONE A": 2800, "ZONE B": 2600,
+            "ZONE C": 2600, "ZONE D": 2400, "โซนยืน": 590
         };
         let cdTicketCount = 1;
+        let bookedTablesList = [];
 
         const urlParams = new URLSearchParams(window.location.search);
         const currentAgent = urlParams.get('agent') ? urlParams.get('agent').toUpperCase() : "DIRECT";
@@ -366,6 +313,20 @@
             document.getElementById('agentBanner').style.display = 'block';
             document.getElementById('agentNameDisplay').textContent = currentAgent;
         }
+
+        // ดึงรายการโต๊ะที่ถูกจองแล้วจาก Google Sheets มาเก็บไว้ทันทีที่โหลดหน้าเว็บ
+        async function fetchBookedTables() {
+            try {
+                const response = await fetch(SCRIPT_URL + "?action=getBookedTables");
+                const result = await response.json();
+                if (result.status === "success") {
+                    bookedTablesList = result.bookedTables || [];
+                }
+            } catch (err) {
+                console.error("ไม่สามารถดึงข้อมูลโต๊ะที่ถูกจองได้", err);
+            }
+        }
+        fetchBookedTables();
 
         function copyAccNum() {
             const input = document.getElementById('accNum');
@@ -406,6 +367,7 @@
             const zoneSelect = document.getElementById("zone").value;
             const dynamicFieldGroup = document.getElementById("dynamicFieldGroup");
             dynamicFieldGroup.innerHTML = '';
+            
             if (zoneSelect === "โซนยืน") {
                 cdTicketCount = 1;
                 dynamicFieldGroup.innerHTML = `<label>เลือกจำนวนบัตรโซนยืน</label>
@@ -417,13 +379,18 @@
             } else {
                 dynamicFieldGroup.innerHTML = `<label>เลือกหมายเลขโต๊ะ</label>
                     <select id="tableNo" required><option value="">-- กรุณาเลือกโต๊ะ --</option></select>`;
-                if (zoneSelect && tableOptions[zoneSelect]) {
+                
+                if (zoneSelect && allTableOptions[zoneSelect]) {
                     const tableSelect = document.getElementById("tableNo");
-                    tableOptions[zoneSelect].forEach(table => {
-                        let opt = document.createElement("option");
-                        opt.value = table;
-                        opt.textContent = "โต๊ะ " + table;
-                        tableSelect.appendChild(opt);
+                    allTableOptions[zoneSelect].forEach(table => {
+                        // กรองตัดโต๊ะที่ถูกจองแล้วออกจากการแสดงผล
+                        const isBooked = bookedTablesList.some(booked => booked.includes(table));
+                        if (!isBooked) {
+                            let opt = document.createElement("option");
+                            opt.value = table;
+                            opt.textContent = "โต๊ะ " + table;
+                            tableSelect.appendChild(opt);
+                        }
                     });
                 }
             }
@@ -480,14 +447,8 @@
             let ticketsArr = (zone === "โซนยืน") ? Array.from({length: cdTicketCount}, (_, i) => bookingId + "-CD" + (i + 1)) : [bookingId + "-1", bookingId + "-2", bookingId + "-3", bookingId + "-4"];
 
             const payload = {
-                action: "bookTicket",
-                bookingId: bookingId,
-                name: name,
-                phone: phone,
-                tableNo: selectionDetail,
-                zone: zone,
-                tickets: ticketsArr,
-                agent: currentAgent
+                action: "bookTicket", bookingId: bookingId, name: name, phone: phone,
+                tableNo: selectionDetail, zone: zone, tickets: ticketsArr, agent: currentAgent
             };
 
             if (fileInput && fileInput.files.length > 0) {
@@ -532,10 +493,7 @@
             const resBox = document.getElementById("searchResult");
             const qrContainer = document.getElementById("searchQrContainer");
             if (!searchInput) { alert("กรุณากรอกเบอร์โทรศัพท์"); return; }
-            
-            if (searchInput.startsWith("0")) {
-                searchInput = searchInput.substring(1);
-            }
+            if (searchInput.startsWith("0")) searchInput = searchInput.substring(1);
 
             try {
                 qrContainer.innerHTML = "<p style='text-align:center;'>กำลังค้นหาข้อมูล...</p>";
@@ -548,24 +506,19 @@
                         allHtml += `<div style="border-top: 1px dashed var(--neon-blue); margin-top: 15px; padding-top: 10px;">`;
                         allHtml += `<p style="margin: 5px 0; font-size: 0.9rem;"><strong>รายการที่ ${bIndex + 1}:</strong> ${booking.name} | <b>${booking.tableNo}</b></p>`;
                         let ticketsHtml = "";
-                        
                         let cleanTickets = [];
                         if (booking.tickets) {
-                          booking.tickets.forEach(rawItem => {
-                            if (!rawItem) return;
-                            String(rawItem).split(',').map(s => s.trim()).forEach(sub => {
-                              if (sub && sub.startsWith("TICKET-") && !sub.includes("สลิป")) {
-                                cleanTickets.push(sub);
-                              }
+                            booking.tickets.forEach(rawItem => {
+                                if (!rawItem) return;
+                                String(rawItem).split(',').map(s => s.trim()).forEach(sub => {
+                                    if (sub && sub.startsWith("TICKET-") && !sub.includes("สลิป")) cleanTickets.push(sub);
+                                });
                             });
-                          });
                         }
-
                         cleanTickets.forEach((tCode, index) => {
                             const qrText = encodeURIComponent("TICKET: " + tCode + " | Name: " + booking.name + " | Table: " + booking.tableNo);
                             ticketsHtml += `<div class="qr-item"><p style="font-size: 0.8rem; color: var(--neon-blue);">ใบที่ ${index + 1}</p><p style="font-size: 0.85rem;"><b>${tCode}</b></p><img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${qrText}" alt="QR Ticket"></div>`;
                         });
-
                         allHtml += `<div>${ticketsHtml || '<p style="font-size:0.8rem; color:#888;">ไม่มีรหัสตั๋วแยกใบแสดง</p>'}</div></div>`;
                     });
                     qrContainer.innerHTML = allHtml;
