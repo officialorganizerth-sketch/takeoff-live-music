@@ -310,21 +310,10 @@
         const urlParams = new URLSearchParams(window.location.search);
         const currentAgent = urlParams.get('agent') ? urlParams.get('agent').toUpperCase() : "DIRECT";
         
+        // ถ้าเปิดลิงก์ตัวแทน ให้แสดงชื่อตัวแทนที่แบนเนอร์ด้านบนตามปกติ (ไม่ล็อกปุ่ม/ไม่เด้งเตือนแล้ว)
         if (currentAgent !== "DIRECT") {
             document.getElementById('agentBanner').style.display = 'block';
             document.getElementById('agentNameDisplay').textContent = currentAgent;
-
-            // ล็อกหน้าจอและปิดการจองทันทีเมื่อเปิดลิงก์ตัวแทน
-            window.addEventListener('DOMContentLoaded', () => {
-                const submitBtn = document.getElementById('submitBtn');
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.style.background = "#555";
-                    submitBtn.style.cursor = "not-allowed";
-                    submitBtn.textContent = "❌ ลิงก์ตัวแทนนี้ปิดการใช้งานชั่วคราว";
-                }
-                alert("❌ แจ้งเตือน: ลิงก์ตัวแทนจำหน่าย (" + currentAgent + ") ปิดให้บริการชั่วคราว ไม่สามารถทำรายการได้ กรุณาใช้ลิงก์หลักในการจองครับ");
-            });
         }
 
         // ดึงรายการโต๊ะที่ถูกจองแล้วจาก Google Sheets มาตัดออกจาก Dropdown
@@ -436,11 +425,6 @@
 
         async function submitForm(e) {
             e.preventDefault();
-            if (currentAgent !== "DIRECT") {
-                alert("❌ ลิงก์ตัวแทนนี้ปิดการใช้งานชั่วคราว ไม่สามารถทำรายการได้");
-                return;
-            }
-
             const name = document.getElementById("name").value;
             const phone = document.getElementById("phone").value;
             const zone = document.getElementById("zone").value;
@@ -548,5 +532,4 @@
         }
     </script>
 </body>
-</html>
 </html>
