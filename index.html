@@ -179,7 +179,7 @@
         <!-- หน้าจองบัตร -->
         <div id="bookTab" class="tab-content active">
             <div style="text-align: center; margin-bottom: 12px;">
-                <img src="https://cdn.phototourl.com/free/2026-09-17-ed31e945-33cb-48a1-ab7b-fdf6f8c74c89.png" alt="Concert Logo" style="max-height: 150px; width: 100%; max-width: 320px; object-fit: contain; border-radius: 10px;">
+                <img src="https://cdn.phototourl.com/free/2026-09-14-a3a7d279-fd79-4dde-aa90-acd4056f1198.png" alt="Concert Logo" style="max-height: 150px; width: 100%; max-width: 320px; object-fit: contain; border-radius: 10px;">
             </div>
             
             <h2 style="color: var(--neon-pink); text-align: center; margin-bottom: 6px; text-shadow: 0 0 10px rgba(255, 0, 255, 0.5); font-size: 1.35rem;">
@@ -262,7 +262,7 @@
         <div id="mapTab" class="tab-content">
             <h2 style="color: var(--neon-blue); text-align: center; margin-bottom: 15px;">🗺️ ผังโซนและที่นั่ง</h2>
             <div style="text-align: center; margin-bottom: 20px;">
-                <img src="https://cdn.phototourl.com/free/2026-09-17-d92b4cab-b43b-4356-b746-1a9ee0ad30cf.jpg" alt="Seating Map" class="map-image">
+                <img src="https://cdn.phototourl.com/free/2026-09-15-83d719f1-133a-46b2-a351-91dedca6d399.png?v=99" alt="Seating Map" class="map-image">
             </div>
             <h2 style="color: var(--neon-pink); text-align: center; margin-bottom: 10px; font-size: 1.2rem; text-shadow: 0 0 8px rgba(255, 0, 255, 0.4);">⏰ กำหนดการงานแสดง (Agenda)</h2>
             <div class="agenda-box">
@@ -282,7 +282,7 @@
             <div class="form-group">
                 <label>เบอร์โทรศัพท์</label>
                 <input type="tel" id="searchInput" placeholder="8xxxxxxxx">
-                <div style="font-size: 0.78rem; color: var(--neon-blue); margin-top: 5px;">* ไม่ใส่เลข 0 ตัวหน้า</div>
+                <div style="font-size: 0.78rem; color: var(--neon-blue); margin-top: 5px;">* รองรับทั้งใส่เลข 0 และไม่ใส่เลข 0 ตัวหน้า</div>
             </div>
             <button type="button" class="btn-submit" onclick="searchTicket()">ค้นหาข้อมูลตั๋ว</button>
             <div id="searchResult" class="result-box"><div id="searchQrContainer"></div></div>
@@ -313,9 +313,21 @@
         if (currentAgent !== "DIRECT") {
             document.getElementById('agentBanner').style.display = 'block';
             document.getElementById('agentNameDisplay').textContent = currentAgent;
+
+            // ล็อกหน้าจอและปิดการจองทันทีเมื่อเปิดลิงก์ตัวแทน
+            window.addEventListener('DOMContentLoaded', () => {
+                const submitBtn = document.getElementById('submitBtn');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.background = "#555";
+                    submitBtn.style.cursor = "not-allowed";
+                    submitBtn.textContent = "❌ ลิงก์ตัวแทนนี้ปิดการใช้งานชั่วคราว";
+                }
+                alert("❌ แจ้งเตือน: ลิงก์ตัวแทนจำหน่าย (" + currentAgent + ") ปิดให้บริการชั่วคราว ไม่สามารถทำรายการได้ กรุณาใช้ลิงก์หลักในการจองครับ");
+            });
         }
 
-        // ดึงรายการโต๊ะที่ถูกจองแล้วจาก Google Sheets มาตัดออกจาก Dropdown ทันทีที่โหลดหน้าเว็บ
+        // ดึงรายการโต๊ะที่ถูกจองแล้วจาก Google Sheets มาตัดออกจาก Dropdown
         async function fetchBookedTables() {
             try {
                 const response = await fetch(SCRIPT_URL + "?action=getBookedTables");
@@ -384,7 +396,6 @@
                 if (zoneSelect && allTableOptions[zoneSelect]) {
                     const tableSelect = document.getElementById("tableNo");
                     allTableOptions[zoneSelect].forEach(table => {
-                        // เช็กว่าโต๊ะนี้ถูกจองไปหรือยัง ถ้าจองแล้วจะไม่นำมาใส่ใน Dropdown
                         const isBooked = bookedTablesList.some(booked => booked.includes(table));
                         if (!isBooked) {
                             let opt = document.createElement("option");
@@ -425,6 +436,11 @@
 
         async function submitForm(e) {
             e.preventDefault();
+            if (currentAgent !== "DIRECT") {
+                alert("❌ ลิงก์ตัวแทนนี้ปิดการใช้งานชั่วคราว ไม่สามารถทำรายการได้");
+                return;
+            }
+
             const name = document.getElementById("name").value;
             const phone = document.getElementById("phone").value;
             const zone = document.getElementById("zone").value;
